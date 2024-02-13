@@ -31,6 +31,19 @@ vector<string> cardOnTable;
 int coinsOnTable;
 int currentBid;
 
+void Ai(Player p2, Player p3, Player p4, int turn) {
+    p2.AiMove(2, coinsOnTable, currentBid);
+    currentBid = p2.bid;
+    cout << currentBid << endl;
+    p3.AiMove(3, coinsOnTable, currentBid);
+    currentBid = p3.bid;
+    cout << currentBid << endl;
+    p4.AiMove(4, coinsOnTable, currentBid);
+    currentBid = p4.bid;
+    cout << currentBid << endl;
+    cout << "Tura: " << turn << endl;
+}
+
 void CardGeneration() {
     srand(time(0));
 
@@ -300,15 +313,23 @@ int main()
             cout << "3. Pas " << endl;
             cout << "4. Status " << endl;
             string move;
-            getline(cin, move);
+            cin >> move;
+            //getline(cin, move);
             if (move == "1" || move == "Sprawdz") {
                 //Sprawdź
                 if (p1.coins >= currentBid) {
                     int selectBid;
-                    selectBid = currentBid;
+                    if (currentBid > 0) {
+                        selectBid = currentBid;
+                    }
+                    else
+                    {
+                        selectBid = 2;
+                    }
                     p1.coins -= selectBid;
                     coinsOnTable += selectBid;
-                    cout << "GRACZ 1 sprawdza" << endl;
+                    cout << "GRACZ 1 sprawdza i wpłaca " << selectBid << endl;
+                    Ai(p2, p3, p4, turn);
                 }
             }
             if (move == "2" || move == "Postaw") {
@@ -321,12 +342,14 @@ int main()
                     coinsOnTable += selectBid;
                     currentBid += (selectBid - currentBid);
                     cout << "GRACZ 1 stawia " << selectBid << " zetonow! " << endl;
+                    Ai(p2, p3, p4, turn);
                 }
             }
             if (move == "3" || move == "Pas") {
                 //Pas
                 p1.pass = 1;
                 cout << "GRACZ 1 pasuje" << endl;
+                Ai(p2, p3, p4, turn);
                 break;
             }
             if (move == "4" || move == "Status") {
@@ -357,16 +380,45 @@ int main()
                 cout << "Zetony na stole: " << coinsOnTable << endl;
                 cout << "Obecny zaklad: " << currentBid << endl;
             }
-            p2.AiMove(2, coinsOnTable, currentBid);
-            currentBid = p2.bid;
-            cout << currentBid << endl;
-            p3.AiMove(3, coinsOnTable, currentBid);
-            currentBid = p3.bid;
-            cout << currentBid << endl;
-            p4.AiMove(4, coinsOnTable, currentBid);
-            currentBid = p4.bid;
-            cout << currentBid << endl;
-        } while (p1.bid == currentBid && p2.bid == currentBid && p3.bid == currentBid && p4.bid == currentBid);
-        return 0;
+            cout << move << endl;
+            cout << "Stoi na while... " << endl;
+            if (p1.bid != currentBid && p2.bid != currentBid && p3.bid != currentBid && p4.bid != currentBid) {
+                cout << "Warunek while spelnia sie..." << endl;
+                cout << "GRACZ 1: " << p1.bid << " = " << currentBid << endl;
+                cout << "GRACZ 2: " << p2.bid << " = " << currentBid << endl;
+                cout << "GRACZ 3: " << p3.bid << " = " << currentBid << endl;
+                cout << "GRACZ 4: " << p4.bid << " = " << currentBid << endl;
+            }
+            else {
+                cout << "Niespelniony warunek while..." << endl;
+                cout << "GRACZ 1: " << p1.bid << " = " << currentBid << endl;
+                cout << "GRACZ 2: " << p2.bid << " = " << currentBid << endl;
+                cout << "GRACZ 3: " << p3.bid << " = " << currentBid << endl;
+                cout << "GRACZ 4: " << p4.bid << " = " << currentBid << endl;
+            }
+        } while (p1.bid != currentBid && p2.bid != currentBid && p3.bid != currentBid && p4.bid != currentBid);
+        //Ustalenie zwyciescy
+        cout << "Koniec tury " << endl;
+        if (p1.pass == 0 && p2.pass == 1 && p3.pass == 1 && p4.pass == 1) {
+            p1.coins += coinsOnTable;
+            coinsOnTable = 0;
+            cout << "Wygrywa Gracz 1! " << endl;
+        }
+        else if (p1.pass == 1 && p2.pass == 0 && p3.pass == 1 && p4.pass == 1) {
+            p2.coins += coinsOnTable;
+            coinsOnTable = 0;
+            cout << "Wygrywa Gracz 2! " << endl;
+        }
+        else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 0 && p4.pass == 1) {
+            p3.coins += coinsOnTable;
+            coinsOnTable = 0;
+            cout << "Wygrywa Gracz 3! " << endl;
+        }
+        else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 1 && p4.pass == 0) {
+            p4.coins += coinsOnTable;
+            coinsOnTable = 0;
+            cout << "Wygrywa Gracz 4! " << endl;
+        }
     }
+    return 0;
 }

@@ -1,20 +1,23 @@
 #include "poker.h"
 
 int Player::AiMove(int nr, int coinsOnTable, int currentBid) {
+    cout << "Obecna stawka: " << currentBid << endl;
     if (active == 1 && pass == 0) {
         cout << "Gracz " << nr << " mysli: " << endl;
         if (bid == currentBid) {
-            ai = rand() % 3;
+            ai = rand() % 4;
             switch (ai)
             {
             case 0:
                 //Pas
                 pass = 1;
                 cout << "GRACZ " << nr << " pasuje" << endl;
+                return currentBid;
                 break;
             case 1:
                 //Czekaj
                 cout << "GRACZ " << nr << " czeka..." << endl;
+                return currentBid;
                 break;
             case 2:
                 //Postaw
@@ -26,6 +29,7 @@ int Player::AiMove(int nr, int coinsOnTable, int currentBid) {
                     coinsOnTable += selectBid;
                     bid += (selectBid - currentBid);
                     cout << "GRACZ " << nr << " postawia " << selectBid << " zetonow! " << endl;
+                    return currentBid;
                 }
                 break;
             case 3:
@@ -36,18 +40,20 @@ int Player::AiMove(int nr, int coinsOnTable, int currentBid) {
                     coins -= selectBid;
                     coinsOnTable += selectBid;
                     cout << "GRACZ " << nr << " sprawdza" << endl;
+                    return currentBid;
                 }
                 break;
             }
         }
         else {
-            ai = rand() % 2;
+            ai = rand() % 3;
             switch (ai)
             {
             case 0:
                 //Pas
                 pass = 1;
                 cout << "GRACZ " << nr << " pasuje" << endl;
+                return currentBid;
                 break;
             case 1:
                 //Postaw
@@ -58,6 +64,7 @@ int Player::AiMove(int nr, int coinsOnTable, int currentBid) {
                     coinsOnTable += selectBid;
                     bid += (selectBid - currentBid);
                     cout << "GRACZ " << nr << " postawia " << selectBid << " zetonow! " << endl;
+                    return currentBid;
                 }
                 break;
             case 2:
@@ -68,6 +75,7 @@ int Player::AiMove(int nr, int coinsOnTable, int currentBid) {
                     coins -= selectBid;
                     coinsOnTable += selectBid;
                     cout << "GRACZ " << nr << " sprawdza" << endl;
+                    return currentBid;
                 }
                 break;
             }
