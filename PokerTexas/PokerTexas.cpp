@@ -31,17 +31,22 @@ vector<string> cardOnTable;
 int coinsOnTable;
 int currentBid;
 
-void Ai(Player p2, Player p3, Player p4, int turn) {
-    p2.AiMove(2, coinsOnTable, currentBid);
-    currentBid = p2.bid;
-    cout << currentBid << endl;
-    p3.AiMove(3, coinsOnTable, currentBid);
-    currentBid = p3.bid;
-    cout << currentBid << endl;
-    p4.AiMove(4, coinsOnTable, currentBid);
-    currentBid = p4.bid;
-    cout << currentBid << endl;
-    cout << "Tura: " << turn << endl;
+void Ai(Player p, int turn, int &aiMove, int &currentBid, int &coins){
+    aiMove = p.AiMove(2);
+    if (aiMove == 0) {
+        p.pass = p.AiPass(2, p.pass);
+    }
+    else if (aiMove == 1) {
+        p.AiWait(2);
+    }
+    else if (aiMove == 2) {
+        currentBid = p.AiBet(2, coinsOnTable, currentBid, coins);
+        //p.AiChangeCoins(coins, currentBid);
+    }
+    else if (aiMove == 3) {
+        coinsOnTable = p.AiCheck(2, coinsOnTable, currentBid, coins);
+        //p.AiChangeCoins(coins, currentBid);
+    }
 }
 
 void CardGeneration() {
@@ -164,6 +169,10 @@ int main()
 
     int player4Active = 0;
     int player4CardCount = 0;
+
+    int ai2Move;
+    int ai3Move;
+    int ai4Move;
 
     cout << "Wpisz liczbe graczy: " << endl;
     cin >> players;
@@ -294,18 +303,6 @@ int main()
     }
 
     for (int turn = 0; turn < 3; turn++) {
-        int bid = 0;
-        p1.bid = 0;
-        p1.pass = 0;
-
-        p2.bid = 0;
-        p2.pass = 0;
-
-        p3.bid = 0;
-        p3.pass = 0;
-
-        p4.bid = 0;
-        p4.pass = 0;
         do {
             cout << "Co robisz?: " << endl;
             cout << "1. Sprawdz " << endl;
@@ -314,7 +311,6 @@ int main()
             cout << "4. Status " << endl;
             string move;
             cin >> move;
-            //getline(cin, move);
             if (move == "1" || move == "Sprawdz") {
                 //Sprawdź
                 if (p1.coins >= currentBid) {
@@ -328,8 +324,11 @@ int main()
                     }
                     p1.coins -= selectBid;
                     coinsOnTable += selectBid;
+                    currentBid = selectBid;
                     cout << "GRACZ 1 sprawdza i wpłaca " << selectBid << endl;
-                    Ai(p2, p3, p4, turn);
+                    Ai(p2, turn, ai2Move, currentBid, p2.coins);
+                    Ai(p3, turn, ai3Move, currentBid, p3.coins);
+                    Ai(p4, turn, ai4Move, currentBid, p4.coins);
                 }
             }
             if (move == "2" || move == "Postaw") {
@@ -342,14 +341,19 @@ int main()
                     coinsOnTable += selectBid;
                     currentBid += (selectBid - currentBid);
                     cout << "GRACZ 1 stawia " << selectBid << " zetonow! " << endl;
-                    Ai(p2, p3, p4, turn);
+                    Ai(p2, turn, ai2Move, currentBid, p2.coins);
+                    Ai(p3, turn, ai3Move, currentBid, p3.coins);
+                    Ai(p4, turn, ai4Move, currentBid, p4.coins);
+
                 }
             }
             if (move == "3" || move == "Pas") {
                 //Pas
                 p1.pass = 1;
                 cout << "GRACZ 1 pasuje" << endl;
-                Ai(p2, p3, p4, turn);
+                Ai(p2, turn, ai2Move, currentBid, p2.coins);
+                Ai(p3, turn, ai3Move, currentBid, p3.coins);
+                Ai(p4, turn, ai4Move, currentBid, p4.coins);
                 break;
             }
             if (move == "4" || move == "Status") {

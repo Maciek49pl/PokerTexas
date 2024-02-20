@@ -16,5 +16,10 @@ public:
     int bid = 0;
     vector<string> hand;
 
-    int AiMove(int nr, int coinsOnTable, int currentBid);
+    int AiMove(int nr);
+    int AiPass(int nr, int pass);
+    void AiWait(int nr);
+    int AiBet(int nr, int &coinsOnTable, int &currentBid, int &coins);
+    int AiCheck(int nr, int &coinsOnTable, int &currentBid, int &coins);
+    void AiChangeCoins(int &coins, int &currentBid);
 };
