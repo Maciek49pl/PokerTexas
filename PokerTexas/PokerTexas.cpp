@@ -1,5 +1,25 @@
 ﻿#include "poker.h"
 
+#define IDC_COINS 100
+#define IDC_OUT 101
+
+#define FILE_MENU_NEW 1
+#define FILE_MENU_OPEN 2
+#define FILE_MENU_EXIT 3
+#define GENERATE_BUTTON 4
+
+#define ONE_PLAYER 5
+#define TWO_PLAYER 6
+#define THREE_PLAYER 7
+#define FOUR_PLAYER 8
+#define SELECT_COINS 9
+#define START_GAME 10
+
+#define CHECK 200
+#define BET 201
+#define PASS 202
+#define WAIT 203
+
 // a = Clubs
 // b = Diamonds
 // c = Hearts
@@ -27,32 +47,63 @@ struct cardStruct {
 vector<cardStruct> Card;
 vector<string> CardName;
 
+Player p1, p2, p3, p4;
+
+vector<string> cardStack(CardName.size());
+vector<int> cardUsed(CardName.size());
+
 vector<string> cardOnTable;
 int coinsOnTable;
 int currentBid;
 
-void Ai(Player p, int turn, int &aiMove, int &currentBid, int &coins){
-    aiMove = p.AiMove(2);
-    if (aiMove == 0) {
-        p.pass = p.AiPass(2, p.pass);
-    }
-    else if (aiMove == 1) {
-        p.AiWait(2);
-    }
-    else if (aiMove == 2) {
-        currentBid = p.AiBet(2, coinsOnTable, currentBid, coins);
-        //p.AiChangeCoins(coins, currentBid);
-    }
-    else if (aiMove == 3) {
-        coinsOnTable = p.AiCheck(2, coinsOnTable, currentBid, coins);
-        //p.AiChangeCoins(coins, currentBid);
+int player1Active = 0;
+int player1CardCount = 0;
+
+int player2Active = 0;
+int player2CardCount = 0;
+
+int player3Active = 0;
+int player3CardCount = 0;
+
+int player4Active = 0;
+int player4CardCount = 0;
+
+int AiCharacter() {
+    //0 - Spokojny
+    //1 - Agresyny
+    //2 - Pasywny
+    //3 - Chaotyczny
+    //4 - 
+    //5 -
+    int ai;
+    //ai = rand() % 2;
+    ai = 0;
+    return ai;
+}
+
+void Ai(Player p, int nr, int ai, int turn, int &aiMove,int &pass, int &currentBid, int &coins, int &playerBid){
+    if (pass == 0)
+    {
+        aiMove = p.AiMove(nr, ai, currentBid, playerBid);
+        if (aiMove == 0) {
+            coinsOnTable = p.AiCheck(nr, coinsOnTable, currentBid, coins, playerBid);
+        }
+        else if (aiMove == 1) {
+            p.pass = p.AiPass(nr, pass);
+        }
+        else if (aiMove == 2) {
+            p.AiWait(nr);
+        }
+        else if (aiMove == 3) {
+            currentBid = p.AiBet(nr, coinsOnTable, currentBid, coins);
+        }
     }
 }
 
-void CardGeneration() {
+vector<string> CardGeneration(HWND hWnd) {
     srand(time(0));
 
-    cout << "Generowanie kart \n";
+    CreateWindowW(L"Static", L"Generowanie kart...", WS_VISIBLE | WS_CHILD, 0, 0, 150, 20, hWnd, NULL, NULL, NULL); // statyczny tekst
 
     char y = '`';
     int z = 0;
@@ -128,16 +179,15 @@ void CardGeneration() {
         CardName.push_back(fullName);
     }
     CardName[0].erase();
+
     for (int x = 0; x <= 52; x++) {
-        cout << CardName[x] << endl;
+        string str = CardName[x];
+        wstring temp = wstring(str.begin(), str.end());
+        LPCWSTR text = temp.c_str();
+        CreateWindowW(L"Static",text, WS_VISIBLE | WS_CHILD, 0, 16+(x*20), 150, 16, hWnd, NULL, NULL, NULL); // statyczny tekst
     }
     cout << "Talia kompletna! \n";
-}
 
-int main()
-{
-    Player p1, p2, p3, p4;
-    CardGeneration();
     vector<string> cardStack(CardName.size());
     vector<int> cardUsed(CardName.size());
 
@@ -152,12 +202,626 @@ int main()
             x--;
         }
     }
-    for (int x = 0; x <= 52; x++) {
+    for (int x = 0; x <= 51; x++) {
+        string str = cardStack[x];
+        wstring temp = wstring(str.begin(), str.end());
+        LPCWSTR text = temp.c_str();
+        CreateWindowW(L"Static", text, WS_VISIBLE | WS_CHILD, 128, 16 + (x * 20), 150, 16, hWnd, NULL, NULL, NULL); // statyczny tekst
         cout << x << ". " << cardStack[x] << endl;
     }
+    return cardStack;
+}
 
-    cout << "ROZDAWANIE KART: " << endl;
-    int players;
+int Pair(Player p, int turn, string card) {
+    int pairFound = 0;
+    for (int x = 0; x < 2; x++) {
+        if (p.hand[x].find(card) != string::npos) {
+            pairFound++;
+        }
+        if (turn > 0) {
+            for (int x = 0; x < 3; x++) {
+                if (cardOnTable[x].find(card) != string::npos) {
+                    pairFound++;
+                }
+            }
+        }
+        if (turn > 1) {
+            if (cardOnTable[3].find(card) != string::npos) {
+                pairFound++;
+            }
+        }
+
+        if (turn > 2) {
+            if (cardOnTable[4].find(card) != string::npos) {
+                pairFound++;
+            }
+        }
+    }
+    if (pairFound == 3) {
+        cout << "Znaleziono pare! " << card << endl;
+        pairFound = 0;
+        return 1;
+    }
+    else if (pairFound == 4) {
+        cout << "Znaleziono trojke! " << card << endl;
+        pairFound = 0;
+        return 2;
+    }
+    else {
+        pairFound = 0;
+        return 0;
+    }
+}
+
+void CalculateHand(Player p, int turn) {
+    int result;
+    for (int x = 0; x < 2; x++) {
+        if (p.hand[x].find("Ace") != string::npos) {
+            result = Pair(p,turn, "Ace");
+        }
+        if (p.hand[x].find("Two") != string::npos) {
+            result = Pair(p, turn, "Two");
+        }
+        if (p.hand[x].find("Three") != string::npos) {
+            result = Pair(p, turn, "Three");
+        }
+        if (p.hand[x].find("Four") != string::npos) {
+            result = Pair(p, turn, "Four");
+        }
+        if (p.hand[x].find("Five") != string::npos) {
+            result = Pair(p, turn, "Five");
+        }
+        if (p.hand[x].find("Six") != string::npos) {
+            result = Pair(p, turn, "Six");
+        }
+        if (p.hand[x].find("Seven") != string::npos) {
+            result = Pair(p, turn, "Seven");
+        }
+        if (p.hand[x].find("Eight") != string::npos) {
+            result = Pair(p, turn, "Eight");
+        }
+        if (p.hand[x].find("Nine") != string::npos) {
+            result = Pair(p, turn, "Nine");
+        }
+        if (p.hand[x].find("Ten") != string::npos) {
+            result = Pair(p, turn, "Ten");
+        }
+        if (p.hand[x].find("Jack") != string::npos) {
+            result = Pair(p, turn, "Jack");
+        }
+        if (p.hand[x].find("Queen") != string::npos) {
+            result = Pair(p, turn, "Queen");
+        }
+        if (p.hand[x].find("King") != string::npos) {
+            result = Pair(p, turn, "King");
+        }
+        if (p.hand[x].find("Clubs") != string::npos) {
+
+        }
+        if (p.hand[x].find("Diamonds") != string::npos) {
+
+        }
+        if (p.hand[x].find("Hearts") != string::npos) {
+
+        }
+        if (p.hand[x].find("Spades") != string::npos) {
+
+        }
+        if (turn > 1) {
+            for (int x = 0; x < 3; x++) {
+                if (cardOnTable[x].find("Ace") != string::npos) {
+                    result = Pair(p, turn, "Ace");
+                }
+                if (cardOnTable[x].find("Two") != string::npos) {
+                    result = Pair(p, turn, "Two");
+                }
+                if (cardOnTable[x].find("Three") != string::npos) {
+                    result = Pair(p, turn, "Three");
+                }
+                if (cardOnTable[x].find("Four") != string::npos) {
+                    result = Pair(p, turn, "Four");
+                }
+                if (cardOnTable[x].find("Five") != string::npos) {
+                    result = Pair(p, turn, "Five");
+                }
+                if (cardOnTable[x].find("Six") != string::npos) {
+                    result = Pair(p, turn, "Six");
+                }
+                if (cardOnTable[x].find("Seven") != string::npos) {
+                    result = Pair(p, turn, "Seven");
+                }
+                if (cardOnTable[x].find("Eight") != string::npos) {
+                    result = Pair(p, turn, "Eight");
+                }
+                if (cardOnTable[x].find("Nine") != string::npos) {
+                    result = Pair(p, turn, "Nine");
+                }
+                if (cardOnTable[x].find("Ten") != string::npos) {
+                    result = Pair(p, turn, "Ten");
+                }
+                if (cardOnTable[x].find("Jack") != string::npos) {
+                    result = Pair(p, turn, "Jack");
+                }
+                if (cardOnTable[x].find("Queen") != string::npos) {
+                    result = Pair(p, turn, "Queen");
+                }
+                if (cardOnTable[x].find("King") != string::npos) {
+                    result = Pair(p, turn, "King");
+                }
+                if (cardOnTable[x].find("Clubs") != string::npos) {
+
+                }
+                if (cardOnTable[x].find("Diamonds") != string::npos) {
+
+                }
+                if (cardOnTable[x].find("Hearts") != string::npos) {
+
+                }
+                if (cardOnTable[x].find("Spades") != string::npos) {
+
+                }
+            }
+        }
+        if (turn > 2) {
+            if (cardOnTable[3].find("Ace") != string::npos) {
+                result = Pair(p, turn, "Ace");
+            }
+            if (cardOnTable[3].find("Two") != string::npos) {
+                result = Pair(p, turn, "Two");
+            }
+            if (cardOnTable[3].find("Three") != string::npos) {
+                result = Pair(p, turn, "Three");
+            }
+            if (cardOnTable[3].find("Four") != string::npos) {
+                result = Pair(p, turn, "Four");
+            }
+            if (cardOnTable[3].find("Five") != string::npos) {
+                result = Pair(p, turn, "Five");
+            }
+            if (cardOnTable[3].find("Six") != string::npos) {
+                result = Pair(p, turn, "Six");
+            }
+            if (cardOnTable[3].find("Seven") != string::npos) {
+                result = Pair(p, turn, "Seven");
+            }
+            if (cardOnTable[3].find("Eight") != string::npos) {
+                result = Pair(p, turn, "Eight");
+            }
+            if (cardOnTable[3].find("Nine") != string::npos) {
+                result = Pair(p, turn, "Nine");
+            }
+            if (cardOnTable[3].find("Ten") != string::npos) {
+                result = Pair(p, turn, "Ten");
+            }
+            if (cardOnTable[3].find("Jack") != string::npos) {
+                result = Pair(p, turn, "Jack");
+            }
+            if (cardOnTable[3].find("Queen") != string::npos) {
+                result = Pair(p, turn, "Queen");
+            }
+            if (cardOnTable[3].find("King") != string::npos) {
+                result = Pair(p, turn, "King");
+            }
+            if (cardOnTable[3].find("Clubs") != string::npos) {
+
+            }
+            if (cardOnTable[3].find("Diamonds") != string::npos) {
+
+            }
+            if (cardOnTable[3].find("Hearts") != string::npos) {
+
+            }
+            if (cardOnTable[3].find("Spades") != string::npos) {
+
+            }
+        }
+        if (turn > 3) {
+            if (cardOnTable[4].find("Ace") != string::npos) {
+                result = Pair(p, turn, "Ace");
+            }
+            if (cardOnTable[4].find("Two") != string::npos) {
+                result = Pair(p, turn, "Two");
+            }
+            if (cardOnTable[4].find("Three") != string::npos) {
+                result = Pair(p, turn, "Three");
+            }
+            if (cardOnTable[4].find("Four") != string::npos) {
+                result = Pair(p, turn, "Four");
+            }
+            if (cardOnTable[4].find("Five") != string::npos) {
+                result = Pair(p, turn, "Five");
+            }
+            if (cardOnTable[4].find("Six") != string::npos) {
+                result = Pair(p, turn, "Six");
+            }
+            if (cardOnTable[4].find("Seven") != string::npos) {
+                result = Pair(p, turn, "Seven");
+            }
+            if (cardOnTable[4].find("Eight") != string::npos) {
+                result = Pair(p, turn, "Eight");
+            }
+            if (cardOnTable[4].find("Nine") != string::npos) {
+                result = Pair(p, turn, "Nine");
+            }
+            if (cardOnTable[4].find("Ten") != string::npos) {
+                result = Pair(p, turn, "Ten");
+            }
+            if (cardOnTable[4].find("Jack") != string::npos) {
+                result = Pair(p, turn, "Jack");
+            }
+            if (cardOnTable[4].find("Queen") != string::npos) {
+                result = Pair(p, turn, "Queen");
+            }
+            if (cardOnTable[4].find("King") != string::npos) {
+                result = Pair(p, turn, "King");
+            }
+            if (cardOnTable[4].find("Clubs") != string::npos) {
+
+            }
+            if (cardOnTable[4].find("Diamonds") != string::npos) {
+
+            }
+            if (cardOnTable[4].find("Hearts") != string::npos) {
+
+            }
+            if (cardOnTable[4].find("Spades") != string::npos) {
+
+            }
+        }
+    }
+
+    //p2
+    int p2Hand;
+
+    //p3
+    int p3Hand;
+
+    //p4
+    int p4Hand;
+}
+
+// Aplikacja okienkowa
+
+LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+
+void AddMenus(HWND);
+void AddControls(HWND);
+void LoadImages(HWND, Player p1, Player p2, Player p3, Player p4);
+void StartGame(HWND);
+void DealingCards(vector<string> cards);
+
+HWND hWindowPlayers0, hWindowPlayers1, hWindowPlayers2, hWindowPlayers3, hWindowPlayers4, hWindowPlayers5, hWindowPlayers6;
+HWND hWindowCoins0, hWindowCoins1, hWindowCoins2, hWindowCoins3, hWindowCoins4;
+HWND hCoins, hOut, hPlayers, hLogo, hCard, hCard1;
+HWND hP1Coins, hP2Coins, hP3Coins, hP4Coins;
+HMENU hMenu;
+
+HWND hCheck, hBet, hWait, hPass;
+
+LPCSTR players;
+LPCSTR outCoins;
+
+vector <string> stack;
+
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow) {
+    WNDCLASSW wc = { 0 }; //definiuje klase okienka
+
+    //przydziela parametry do okienka
+    wc.hbrBackground = (HBRUSH)COLOR_WINDOW; // definiuje tło okna
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW); // definiuje kursor okna
+    wc.hInstance = hInst;
+    wc.lpszClassName = L"myWindowClass"; //definiuje nazwe klasy
+    wc.lpfnWndProc = WindowProcedure; //definiuje proces okna
+    
+    if (!RegisterClassW(&wc)) {
+        return -1;
+    }
+
+    CreateWindowW(L"myWindowClass", L"My Window", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, 1024, 1024, NULL, NULL, NULL, NULL); //Tworzy okienko
+
+    MSG msg = { 0 };
+    while (GetMessage(&msg, NULL, NULL, NULL)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return 0;
+}
+
+LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
+    switch (msg) {
+    case WM_COMMAND:
+        switch (wp)
+        {
+        case FILE_MENU_NEW:
+            MessageBeep(MB_HELP);
+            break;
+        case ONE_PLAYER:
+            players = "1";
+            p1.active = 1;
+            p2.active = 0;
+            p3.active = 0;
+            p4.active = 0;
+            SetWindowTextA(hPlayers, players);
+            break;
+        case TWO_PLAYER:
+            players = "2";
+            p1.active = 1;
+            p2.active = 1;
+            p3.active = 0;
+            p4.active = 0;
+            SetWindowTextA(hPlayers, players);
+            break;
+        case THREE_PLAYER:
+            players = "3";
+            p1.active = 1;
+            p2.active = 1;
+            p3.active = 1;
+            p4.active = 0;
+            SetWindowTextA(hPlayers, players);
+            break;
+        case FOUR_PLAYER:
+            players = "4";
+            p1.active = 1;
+            p2.active = 1;
+            p3.active = 1;
+            p4.active = 1;
+            SetWindowTextA(hPlayers, players);
+            break;
+        case SELECT_COINS:
+            char coins[30], out[50];
+            GetWindowTextA(hCoins, coins, 30);
+            strcpy_s(out, coins);
+            SetWindowTextA(hOut, out);
+
+            break;
+        case START_GAME:
+            if (players != NULL && coins != NULL)
+            {
+                DestroyWindow(hPlayers);
+                DestroyWindow(hCoins);
+                //DestroyWindow(hOut);
+                ShowWindow(hOut, SW_HIDE);
+                DestroyWindow(hWindowPlayers0);
+                DestroyWindow(hWindowPlayers1);
+                DestroyWindow(hWindowPlayers2);
+                DestroyWindow(hWindowPlayers3);
+                DestroyWindow(hWindowPlayers4);
+                DestroyWindow(hWindowPlayers5);
+                DestroyWindow(hWindowPlayers6);
+                DestroyWindow(hWindowCoins0);
+                DestroyWindow(hWindowCoins1);
+                DestroyWindow(hWindowCoins2);
+                DestroyWindow(hWindowCoins3);
+                DestroyWindow(hWindowCoins4);
+                StartGame(hWnd);
+                DealingCards(stack);
+                LoadImages(hWnd, p1, p2, p3, p4);
+            }
+            break;
+        case CHECK:
+            MessageBeep(MB_ICONERROR);
+            break;
+        case BET:
+            MessageBeep(MB_ICONERROR);
+            break;
+        case PASS:
+            MessageBeep(MB_ICONERROR);
+            break;
+        case WAIT:
+            MessageBeep(MB_ICONERROR);
+            break;
+        case FILE_MENU_OPEN:
+            MessageBeep(MB_ICONERROR);
+            break;
+        case FILE_MENU_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        }
+        break;
+    case WM_CREATE:
+        stack = CardGeneration(hWnd);
+        AddControls(hWnd);
+        AddMenus(hWnd);
+        break;
+    case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+    default:
+        return DefWindowProcW(hWnd, msg, wp, lp);
+    }
+}
+
+//dodaje menus
+void AddMenus(HWND hWnd) {
+    hMenu = CreateMenu();
+    HMENU hFileMenu = CreateMenu();
+    HMENU hSubMenu = CreateMenu();
+
+    AppendMenu(hSubMenu, MF_STRING, NULL, L"CHANGE_TITLE");
+
+    AppendMenu(hFileMenu, MF_STRING, FILE_MENU_NEW, L"New"); // Uzupelnia do zakladki FILE
+    AppendMenu(hFileMenu, MF_POPUP, (UINT_PTR)hSubMenu, L"Open SubMenu");
+    AppendMenu(hFileMenu, MF_SEPARATOR, NULL, NULL);
+    AppendMenu(hFileMenu, MF_STRING, FILE_MENU_EXIT, L"Exit");
+
+    AppendMenu(hMenu, MF_POPUP,(UINT_PTR)hFileMenu, L"File"); // dodaje FILE do okienka
+    AppendMenu(hMenu, MF_STRING, 2, L"Help"); 
+
+    SetMenu(hWnd, hMenu); //Ustawia menu
+}
+
+void AddControls(HWND hWnd) {
+   hWindowPlayers0 = CreateWindowW(L"Static", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, 290, 40, 240, 150, hWnd, NULL, NULL, NULL); // statyczny tekst
+   hWindowPlayers1 = CreateWindowW(L"Static", L"Wybierz Liczbę graczy: ", WS_VISIBLE | WS_CHILD, 330, 50, 180, 80, hWnd, NULL, NULL, NULL); // statyczny tekst
+   hWindowPlayers2 = CreateWindowW(L"Button", L"1", WS_VISIBLE | WS_CHILD | WS_BORDER, 300, 80, 50, 30, hWnd, (HMENU)ONE_PLAYER, NULL, NULL); // Przycisk
+   hWindowPlayers3 = CreateWindowW(L"Button", L"2", WS_VISIBLE | WS_CHILD | WS_BORDER, 350, 80, 50, 30, hWnd, (HMENU)TWO_PLAYER, NULL, NULL); // Przycisk
+   hWindowPlayers4 = CreateWindowW(L"Button", L"3", WS_VISIBLE | WS_CHILD | WS_BORDER, 400, 80, 50, 30, hWnd, (HMENU)THREE_PLAYER, NULL, NULL); // Przycisk
+   hWindowPlayers5 = CreateWindowW(L"Button", L"4", WS_VISIBLE | WS_CHILD | WS_BORDER, 450, 80, 50, 30, hWnd, (HMENU)FOUR_PLAYER, NULL, NULL); // Przycisk
+   hWindowPlayers6 = CreateWindowW(L"Static", L"Liczba graczy: ", WS_VISIBLE | WS_CHILD, 300, 120, 100, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+   hPlayers = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD, 400, 120, 100, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+   hWindowCoins0 = CreateWindowW(L"Static", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, 290, 200, 240, 150, hWnd, NULL, NULL, NULL); // statyczny tekst
+   hWindowCoins1 = CreateWindowW(L"Static", L"Podaj liczbe żetonów: ", WS_VISIBLE | WS_CHILD, 330, 210, 180, 80, hWnd, NULL, NULL, NULL); // statyczny tekst
+   hCoins = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 340, 230, 120, 20, hWnd, NULL, NULL, NULL); // tekst z edycją
+   hWindowCoins2 = CreateWindowW(L"Button", L"Wybierz", WS_VISIBLE | WS_CHILD | WS_BORDER, 365, 255, 70, 40, hWnd, (HMENU)SELECT_COINS, NULL, NULL); // Przycisk
+   hWindowCoins3 = CreateWindowW(L"Static", L"Liczba żetonów: ", WS_VISIBLE | WS_CHILD, 300, 310, 120, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+   hOut = CreateWindow(L"Static", L"", WS_VISIBLE | WS_CHILD, 430, 310, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+   hWindowCoins4 = CreateWindowW(L"Button", L"START", WS_VISIBLE | WS_CHILD | WS_BORDER, 365, 400, 70, 40, hWnd, (HMENU)START_GAME, NULL, NULL); // Przycisk
+}
+
+void StartGame(HWND hWnd) {
+    char coins[30], out[50];
+    GetWindowTextA(hOut, coins, 30);
+    OutputDebugStringA(coins);
+    if (coins != NULL)
+    {
+        OutputDebugStringA("Udalo sie");
+    }
+    //out = outCoins;
+
+    if (players == "1") {
+        CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+    }
+    if (players == "2") {
+        CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP2Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 270 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+    }
+    if (players == "3") {
+        CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP2Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 270 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        CreateWindowW(L"Static", L"GRACZ 3", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP3Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+    }
+    if (players == "4") {
+        CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP2Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 270 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        CreateWindowW(L"Static", L"GRACZ 3", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP3Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        CreateWindowW(L"Static", L"GRACZ 4", WS_VISIBLE | WS_CHILD | WS_BORDER, 650 + 800, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 650 + 800, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP4Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 670 + 800, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+    }
+    if (p1.active == 1) {
+        p1.coins = (int)coins;
+        SetWindowTextA(hP1Coins, coins);
+    }
+    if (p2.active == 1) {
+        p2.coins = (int)coins;
+        SetWindowTextA(hP2Coins, coins);
+    }
+    if (p3.active == 1) {
+        p3.coins = (int)coins;
+        SetWindowTextA(hP3Coins, coins);
+    }
+    if (p4.active == 1) {
+        p4.coins = (int)coins;
+        SetWindowTextA(hP4Coins, coins);
+    }
+
+    hCheck = CreateWindowW(L"Button", L"Sprawdź", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 850, 100, 30, hWnd, (HMENU)CHECK, NULL, NULL); // Przycisk
+    hBet = CreateWindowW(L"Button", L"Postaw", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 880, 100, 30, hWnd, (HMENU)BET, NULL, NULL); // Przycisk
+    hPass = CreateWindowW(L"Button", L"Pas", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 910, 100, 30, hWnd, (HMENU)PASS, NULL, NULL); // Przycisk
+    hWait = CreateWindowW(L"Button", L"Czekaj", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 940, 100, 30, hWnd, (HMENU)WAIT, NULL, NULL); // Przycisk
+}
+
+void DealingCards(vector<string> cards) {
+    for (int x = 0; x < stoi(players); x++) {
+        if (p1.active == 1) {
+            for (player1CardCount = 0; player1CardCount < 2; player1CardCount++) {
+                if (cards[x].empty()) {
+                    x++;
+                    player1CardCount--;
+                }
+                else {
+                    p1.hand.push_back(cards[x]);
+                    cards[x].erase();
+                }
+            }
+        }
+        else {
+            p1.hand.push_back("Puste");
+            p1.hand.push_back("Puste");
+        }
+        if (p2.active == 1) {
+            for (player2CardCount = 0; player2CardCount < 2; player2CardCount++) {
+                if (cards[x].empty()) {
+                    x++;
+                    player2CardCount--;
+                }
+                else {
+                    p2.hand.push_back(cards[x]);
+                    cards[x].erase();
+                }
+            }
+        }
+        else {
+            p2.hand.push_back("Puste");
+            p2.hand.push_back("Puste");
+        }
+        if (p3.active == 1) {
+            for (player3CardCount = 0; player3CardCount < 2; player3CardCount++) {
+                if (cards[x].empty()) {
+                    x++;
+                    player3CardCount--;
+                }
+                else {
+                    p3.hand.push_back(cards[x]);
+                    cards[x].erase();
+                }
+            }
+        }
+        else {
+            p3.hand.push_back("Puste");
+            p3.hand.push_back("Puste");
+        }
+        if (p4.active == 1) {
+            for (player4CardCount = 0; player4CardCount < 2; player4CardCount++) {
+                if (cards[x].empty()) {
+                    x++;
+                    player4CardCount--;
+                }
+                else {
+                    p4.hand.push_back(cards[x]);
+                    cards[x].erase();
+                }
+            }
+        }
+        else {
+            p4.hand.push_back("Puste");
+            p4.hand.push_back("Puste");
+        }
+    }
+}
+
+// KONIEC APKI OKIENKOWEJ //
+
+int main()
+{
+    //NIE ZAIMPLEMENTOWANE RZECZY
     int player1Active = 0;
     int player1CardCount = 0;
 
@@ -174,60 +838,14 @@ int main()
     int ai3Move;
     int ai4Move;
 
-    cout << "Wpisz liczbe graczy: " << endl;
-    cin >> players;
-    switch (players)
-    {
-    case 1:
-        p1.active = 1;
-        p2.active = 0;
-        p3.active = 0;
-        p4.active = 0;
-        break;
-    case 2:
-        p1.active = 1;
-        p2.active = 1;
-        p3.active = 0;
-        p4.active = 0;
-        break;
-    case 3:
-        p1.active = 1;
-        p2.active = 1;
-        p3.active = 1;
-        p4.active = 0;
-        break;
-    case 4:
-        p1.active = 1;
-        p2.active = 1;
-        p3.active = 1;
-        p4.active = 1;
-        break;
-    default:
-        cout << "BŁĄD" << endl;
-        p1.active = 1;
-        p2.active = 1;
-        p3.active = 1;
-        p4.active = 1;
-        break;
-    }
+    int cardOnTop = 0;
 
-    int coins;
-    cout << "Wpisz liczbe zetonow: " << endl;
-    cin >> coins;
-    if (p1.active == 1) {
-        p1.coins = coins;
-    }
-    if (p2.active == 1) {
-        p2.coins = coins;
-    }
-    if (p3.active == 1) {
-        p3.coins = coins;
-    }
-    if (p4.active == 1) {
-        p4.coins = coins;
-    }
+    if (p1.active == 1) { cardOnTop = 2; p1.ai = AiCharacter(); }
+    if (p2.active == 1) { cardOnTop = 4; p2.ai = AiCharacter(); }
+    if (p3.active == 1) { cardOnTop = 6; p3.ai = AiCharacter(); }
+    if (p4.active == 1) { cardOnTop = 8; p4.ai = AiCharacter(); }
 
-    for (int x = 0; x < players; x++) {
+    for (int x = 0; x < (int)players; x++) {
         if (p1.active == 1) {
             for (player1CardCount = 0; player1CardCount < 2; player1CardCount++) {
                 if (cardStack[x].empty()) {
@@ -302,8 +920,9 @@ int main()
         cout << p4.hand[0] << ", " << p4.hand[1] << endl;
     }
 
-    for (int turn = 0; turn < 3; turn++) {
+    for (int turn = 0; turn < 4; turn++) {
         do {
+            CalculateHand(p1, turn);
             cout << "Co robisz?: " << endl;
             cout << "1. Sprawdz " << endl;
             cout << "2. Postaw " << endl;
@@ -325,10 +944,11 @@ int main()
                     p1.coins -= selectBid;
                     coinsOnTable += selectBid;
                     currentBid = selectBid;
+                    p1.bid = currentBid;
                     cout << "GRACZ 1 sprawdza i wpłaca " << selectBid << endl;
-                    Ai(p2, turn, ai2Move, currentBid, p2.coins);
-                    Ai(p3, turn, ai3Move, currentBid, p3.coins);
-                    Ai(p4, turn, ai4Move, currentBid, p4.coins);
+                    Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
+                    Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
+                    Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
                 }
             }
             if (move == "2" || move == "Postaw") {
@@ -341,88 +961,151 @@ int main()
                     coinsOnTable += selectBid;
                     currentBid += (selectBid - currentBid);
                     cout << "GRACZ 1 stawia " << selectBid << " zetonow! " << endl;
-                    Ai(p2, turn, ai2Move, currentBid, p2.coins);
-                    Ai(p3, turn, ai3Move, currentBid, p3.coins);
-                    Ai(p4, turn, ai4Move, currentBid, p4.coins);
-
+                    Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
+                    Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
+                    Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
                 }
             }
             if (move == "3" || move == "Pas") {
                 //Pas
                 p1.pass = 1;
                 cout << "GRACZ 1 pasuje" << endl;
-                Ai(p2, turn, ai2Move, currentBid, p2.coins);
-                Ai(p3, turn, ai3Move, currentBid, p3.coins);
-                Ai(p4, turn, ai4Move, currentBid, p4.coins);
+                Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
+                Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
+                Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
                 break;
             }
             if (move == "4" || move == "Status") {
                 if (p1.active == 1)
                 {
-                    cout << "GRACZ 1: " << endl;
+                    string passStatus;
+                    if (p1.pass == 0) {
+                        passStatus = "Aktywny ";
+                    }
+                    else { passStatus = "Spasowal "; }
+                    cout << "GRACZ 1: " << passStatus << endl;
                     cout << "Zetony: " << p1.coins << endl;
                     cout << p1.hand[0] << ", " << p1.hand[1] << endl;
                 }
                 if (p2.active == 1)
                 {
-                    cout << "GRACZ 2: " << endl;
+                    string passStatus;
+                    if (p2.pass == 0) {
+                        passStatus = "Aktywny ";
+                    }
+                    else { passStatus = "Spasowal "; }
+                    cout << "GRACZ 2: " << passStatus << endl;
                     cout << "Zetony: " << p2.coins << endl;
                     cout << p2.hand[0] << ", " << p2.hand[1] << endl;
                 }
                 if (p3.active == 1)
                 {
-                    cout << "GRACZ 3: " << endl;
+                    string passStatus;
+                    if (p3.pass == 0) {
+                        passStatus = "Aktywny ";
+                    }
+                    else { passStatus = "Spasowal "; }
+                    cout << "GRACZ 3: " << passStatus << endl;
                     cout << "Zetony: " << p3.coins << endl;
                     cout << p3.hand[0] << ", " << p3.hand[1] << endl;
                 }
                 if (p4.active == 1)
                 {
-                    cout << "GRACZ 4: " << endl;
+                    string passStatus;
+                    if (p4.pass == 0) {
+                        passStatus = "Aktywny ";
+                    }
+                    else { passStatus = "Spasowal "; }
+                    cout << "GRACZ 4: " << passStatus << endl;
                     cout << "Zetony: " << p4.coins << endl;
                     cout << p4.hand[0] << ", " << p4.hand[1] << endl;
                 }
                 cout << "Zetony na stole: " << coinsOnTable << endl;
                 cout << "Obecny zaklad: " << currentBid << endl;
+                if (cardOnTop > 2 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << endl; }
+                if (cardOnTop > 4 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << cardOnTable[3] << endl; }
+                if (cardOnTop > 6 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << ", " << cardOnTable[3] << ", " << cardOnTable[4] << endl; }
             }
-            cout << move << endl;
-            cout << "Stoi na while... " << endl;
-            if (p1.bid != currentBid && p2.bid != currentBid && p3.bid != currentBid && p4.bid != currentBid) {
-                cout << "Warunek while spelnia sie..." << endl;
-                cout << "GRACZ 1: " << p1.bid << " = " << currentBid << endl;
-                cout << "GRACZ 2: " << p2.bid << " = " << currentBid << endl;
-                cout << "GRACZ 3: " << p3.bid << " = " << currentBid << endl;
-                cout << "GRACZ 4: " << p4.bid << " = " << currentBid << endl;
+
+            if (((p1.pass == 0 && p1.bid == currentBid) || (p1.pass == 1 && p1.bid != currentBid)) && ((p2.pass == 0 && p2.bid == currentBid) || (p2.pass == 1 && p2.bid != currentBid)) && ((p3.pass == 0 && p3.bid == currentBid) || (p3.pass == 1 && p3.bid != currentBid)) && ((p4.pass == 0 && p4.bid == currentBid) || (p4.pass == 1 && p4.bid != currentBid))) {
+                cout << "Rozdawanie kart... " << endl;
+                if (turn == 0)
+                {
+                    for (int x = 0; x < 3; x++) {
+                        if (cardStack[cardOnTop] == "") {
+                            cardOnTop++;
+                        }
+                        cout << "Karta: " << cardStack[cardOnTop] << ", " << cardOnTop << endl;
+                        cardOnTop++;
+                        cardOnTable.push_back(cardStack[cardOnTop]);
+                    }
+                }
+                if (turn == 1)
+                {
+                    if (cardStack[cardOnTop] == "") {
+                        cardOnTop++;
+                    }
+                    cout << "Karta: " << cardStack[cardOnTop] << ", " << cardOnTop << endl;
+                    cardOnTop++;
+                    cardOnTable.push_back(cardStack[cardOnTop]);
+                }
+                if (turn == 2)
+                {
+                    if (cardStack[cardOnTop] == "") {
+                        cardOnTop++;
+                    }
+                    cout << "Karta: " << cardStack[cardOnTop] << ", " << cardOnTop << endl;
+                    cardOnTop++;
+                    cardOnTable.push_back(cardStack[cardOnTop]);
+                }
             }
-            else {
-                cout << "Niespelniony warunek while..." << endl;
-                cout << "GRACZ 1: " << p1.bid << " = " << currentBid << endl;
-                cout << "GRACZ 2: " << p2.bid << " = " << currentBid << endl;
-                cout << "GRACZ 3: " << p3.bid << " = " << currentBid << endl;
-                cout << "GRACZ 4: " << p4.bid << " = " << currentBid << endl;
+
+            //Ustalenie zwyciescy
+            if (p1.pass == 0 && p2.pass == 1 && p3.pass == 1 && p4.pass == 1) {
+                p1.coins += coinsOnTable;
+                coinsOnTable = 0;
+                cout << "Wygrywa Gracz 1! " << endl;
+                p2.pass = 0;
+                p3.pass = 0;
+                p4.pass = 0;
+                break;
             }
-        } while (p1.bid != currentBid && p2.bid != currentBid && p3.bid != currentBid && p4.bid != currentBid);
-        //Ustalenie zwyciescy
+            else if (p1.pass == 1 && p2.pass == 0 && p3.pass == 1 && p4.pass == 1) {
+                p2.coins += coinsOnTable;
+                coinsOnTable = 0;
+                cout << "Wygrywa Gracz 2! " << endl;
+                p1.pass = 0;
+                p3.pass = 0;
+                p4.pass = 0;
+                break;
+            }
+            else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 0 && p4.pass == 1) {
+                p3.coins += coinsOnTable;
+                coinsOnTable = 0;
+                cout << "Wygrywa Gracz 3! " << endl;
+                p1.pass = 0;
+                p2.pass = 0;
+                p4.pass = 0;
+                break;
+            }
+            else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 1 && p4.pass == 0) {
+                p4.coins += coinsOnTable;
+                coinsOnTable = 0;
+                cout << "Wygrywa Gracz 4! " << endl;
+                p1.pass = 0;
+                p2.pass = 0;
+                p3.pass = 0;
+                break;
+            }
+
+            if(p1.bid == currentBid && p1.pass == 0) { cout << "GRACZ 1 jeszcze gra! " << endl; }
+            if (p2.bid == currentBid && p2.pass == 0) { cout << "GRACZ 2 jeszcze gra! " << endl; }
+            if (p3.bid == currentBid && p3.pass == 0) { cout << "GRACZ 3 jeszcze gra! " << endl; }
+            if (p4.bid == currentBid && p4.pass == 0) { cout << "GRACZ 4 jeszcze gra! " << endl; }
+
+        } while ((p1.bid != currentBid || p1.pass != 0) && (p2.bid != currentBid || p2.pass != 0) && (p3.bid != currentBid || p3.pass != 0) && (p4.bid != currentBid || p4.pass != 0));
         cout << "Koniec tury " << endl;
-        if (p1.pass == 0 && p2.pass == 1 && p3.pass == 1 && p4.pass == 1) {
-            p1.coins += coinsOnTable;
-            coinsOnTable = 0;
-            cout << "Wygrywa Gracz 1! " << endl;
-        }
-        else if (p1.pass == 1 && p2.pass == 0 && p3.pass == 1 && p4.pass == 1) {
-            p2.coins += coinsOnTable;
-            coinsOnTable = 0;
-            cout << "Wygrywa Gracz 2! " << endl;
-        }
-        else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 0 && p4.pass == 1) {
-            p3.coins += coinsOnTable;
-            coinsOnTable = 0;
-            cout << "Wygrywa Gracz 3! " << endl;
-        }
-        else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 1 && p4.pass == 0) {
-            p4.coins += coinsOnTable;
-            coinsOnTable = 0;
-            cout << "Wygrywa Gracz 4! " << endl;
-        }
     }
     return 0;
+
 }
