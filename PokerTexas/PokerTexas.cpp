@@ -486,22 +486,37 @@ LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 
 void AddMenus(HWND);
 void AddControls(HWND);
-void LoadImages(HWND, Player p1, Player p2, Player p3, Player p4);
+void LoadImages(HWND, vector<string> cards, Player p1, Player p2, Player p3, Player p4);
+void LoadDealingCards(HWND, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4);
 void StartGame(HWND);
 void DealingCards(vector<string> cards);
+int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4, int cardOnTop);
 
 HWND hWindowPlayers0, hWindowPlayers1, hWindowPlayers2, hWindowPlayers3, hWindowPlayers4, hWindowPlayers5, hWindowPlayers6;
 HWND hWindowCoins0, hWindowCoins1, hWindowCoins2, hWindowCoins3, hWindowCoins4;
 HWND hCoins, hOut, hPlayers, hLogo, hCard, hCard1;
 HWND hP1Coins, hP2Coins, hP3Coins, hP4Coins;
+HWND hP1Bet, hP2Bet, hP3Bet, hP4Bet;
 HMENU hMenu;
 
 HWND hCheck, hBet, hWait, hPass;
+HWND hTurn;
 
 LPCSTR players;
 LPCSTR outCoins;
 
 vector <string> stack;
+
+int moveChoice;
+
+int ai2Move;
+int ai3Move;
+int ai4Move;
+
+int turn = 0;
+LPCSTR lTurn;
+
+int cardOnTop = 0;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow) {
     WNDCLASSW wc = { 0 }; //definiuje klase okienka
@@ -517,7 +532,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
         return -1;
     }
 
-    CreateWindowW(L"myWindowClass", L"My Window", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, 1024, 1024, NULL, NULL, NULL, NULL); //Tworzy okienko
+    CreateWindowW(L"myWindowClass", L"My Window", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 1920, 1080, NULL, NULL, NULL, NULL); //Tworzy okienko
 
     MSG msg = { 0 };
     while (GetMessage(&msg, NULL, NULL, NULL)) {
@@ -577,9 +592,9 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         case START_GAME:
             if (players != NULL && coins != NULL)
             {
+                SetWindowTextA(hTurn, lTurn);
                 DestroyWindow(hPlayers);
                 DestroyWindow(hCoins);
-                //DestroyWindow(hOut);
                 ShowWindow(hOut, SW_HIDE);
                 DestroyWindow(hWindowPlayers0);
                 DestroyWindow(hWindowPlayers1);
@@ -595,19 +610,35 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
                 DestroyWindow(hWindowCoins4);
                 StartGame(hWnd);
                 DealingCards(stack);
-                LoadImages(hWnd, p1, p2, p3, p4);
+                LoadImages(hWnd, stack, p1, p2, p3, p4);
             }
             break;
         case CHECK:
+            moveChoice = 1;
+            turn = PlayGame(hWnd, turn, stack, p1, p2, p3, p4, cardOnTop);
+            SetWindowTextA(hTurn, lTurn);
+            LoadDealingCards(hWnd, turn, stack, p1, p2, p3, p4);
             MessageBeep(MB_ICONERROR);
             break;
         case BET:
+            moveChoice = 2;
+            turn = PlayGame(hWnd, turn, stack, p1, p2, p3, p4, cardOnTop);
+            SetWindowTextA(hTurn, lTurn);
+            LoadDealingCards(hWnd, turn, stack, p1, p2, p3, p4);
             MessageBeep(MB_ICONERROR);
             break;
         case PASS:
+            moveChoice = 3;
+            turn = PlayGame(hWnd, turn, stack, p1, p2, p3, p4, cardOnTop);
+            SetWindowTextA(hTurn, lTurn);
+            LoadDealingCards(hWnd, turn, stack, p1, p2, p3, p4);
             MessageBeep(MB_ICONERROR);
             break;
         case WAIT:
+            moveChoice = 4;
+            turn = PlayGame(hWnd, turn, stack, p1, p2, p3, p4, cardOnTop);
+            SetWindowTextA(hTurn, lTurn);
+            LoadDealingCards(hWnd, turn, stack, p1, p2, p3, p4);
             MessageBeep(MB_ICONERROR);
             break;
         case FILE_MENU_OPEN:
@@ -673,39 +704,45 @@ void AddControls(HWND hWnd) {
 void StartGame(HWND hWnd) {
     char coins[30], out[50];
     GetWindowTextA(hOut, coins, 30);
-    OutputDebugStringA(coins);
-    if (coins != NULL)
-    {
-        OutputDebugStringA("Udalo sie");
-    }
-    //out = outCoins;
 
     if (players == "1") {
         CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
     }
     if (players == "2") {
         CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
+        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
         CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP2Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 270 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        hP2Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 200, 630, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
     }
     if (players == "3") {
         CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
+        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
         CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP2Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 270 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
+        hP2Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 200, 630, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
         CreateWindowW(L"Static", L"GRACZ 3", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP3Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        hP3Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 580, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
     }
     if (players == "4") {
@@ -713,17 +750,25 @@ void StartGame(HWND hWnd) {
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
+        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
         CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP2Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 270 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        hP2Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 200, 630, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
         CreateWindowW(L"Static", L"GRACZ 3", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP3Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
+        hP3Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 580, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
         CreateWindowW(L"Static", L"GRACZ 4", WS_VISIBLE | WS_CHILD | WS_BORDER, 650 + 800, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 650 + 800, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP4Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 670 + 800, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+        hP4Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 630, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
     }
     if (p1.active == 1) {
         p1.coins = (int)coins;
@@ -746,6 +791,8 @@ void StartGame(HWND hWnd) {
     hBet = CreateWindowW(L"Button", L"Postaw", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 880, 100, 30, hWnd, (HMENU)BET, NULL, NULL); // Przycisk
     hPass = CreateWindowW(L"Button", L"Pas", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 910, 100, 30, hWnd, (HMENU)PASS, NULL, NULL); // Przycisk
     hWait = CreateWindowW(L"Button", L"Czekaj", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 940, 100, 30, hWnd, (HMENU)WAIT, NULL, NULL); // Przycisk
+
+    hTurn = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 1250, 650, 50, 30, hWnd, NULL, NULL, NULL); // Przycisk
 }
 
 void DealingCards(vector<string> cards) {
@@ -817,295 +864,205 @@ void DealingCards(vector<string> cards) {
     }
 }
 
-// KONIEC APKI OKIENKOWEJ //
-
-int main()
-{
-    //NIE ZAIMPLEMENTOWANE RZECZY
-    int player1Active = 0;
-    int player1CardCount = 0;
-
-    int player2Active = 0;
-    int player2CardCount = 0;
-
-    int player3Active = 0;
-    int player3CardCount = 0;
-
-    int player4Active = 0;
-    int player4CardCount = 0;
-
-    int ai2Move;
-    int ai3Move;
-    int ai4Move;
-
-    int cardOnTop = 0;
-
-    if (p1.active == 1) { cardOnTop = 2; p1.ai = AiCharacter(); }
-    if (p2.active == 1) { cardOnTop = 4; p2.ai = AiCharacter(); }
-    if (p3.active == 1) { cardOnTop = 6; p3.ai = AiCharacter(); }
-    if (p4.active == 1) { cardOnTop = 8; p4.ai = AiCharacter(); }
-
-    for (int x = 0; x < (int)players; x++) {
-        if (p1.active == 1) {
-            for (player1CardCount = 0; player1CardCount < 2; player1CardCount++) {
-                if (cardStack[x].empty()) {
-                    x++;
-                    player1CardCount--;
-                }
-                else {
-                    p1.hand.push_back(cardStack[x]);
-                    cardStack[x].erase();
-                }
-            }
-        }
-        if (p2.active == 1) {
-            for (player2CardCount = 0; player2CardCount < 2; player2CardCount++) {
-                if (cardStack[x].empty()) {
-                    x++;
-                    player2CardCount--;
-                }
-                else {
-                    p2.hand.push_back(cardStack[x]);
-                    cardStack[x].erase();
-                }
-            }
-        }
-        if (p3.active == 1) {
-            for (player3CardCount = 0; player3CardCount < 2; player3CardCount++) {
-                if (cardStack[x].empty()) {
-                    x++;
-                    player3CardCount--;
-                }
-                else {
-                    p3.hand.push_back(cardStack[x]);
-                    cardStack[x].erase();
-                }
-            }
-        }
-        if (p4.active == 1) {
-            for (player4CardCount = 0; player4CardCount < 2; player4CardCount++) {
-                if (cardStack[x].empty()) {
-                    x++;
-                    player4CardCount--;
-                }
-                else {
-                    p4.hand.push_back(cardStack[x]);
-                    cardStack[x].erase();
-                }
-            }
-        }
+int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4, int cardOnTop) {
+    if (p1.active == 1) { 
+        cardOnTop = 2; 
+        p1.ai = AiCharacter();
     }
-    if (p1.active == 1)
-    {
-        cout << "GRACZ 1: " << endl;
-        cout << "Zetony: " << p1.coins << endl;
-        cout << p1.hand[0] << ", " << p1.hand[1] << endl;
+    if (p2.active == 1) { 
+        cardOnTop = 4; 
+        p2.ai = AiCharacter();
     }
-    if (p2.active == 1)
-    {
-        cout << "GRACZ 2: " << endl;
-        cout << "Zetony: " << p2.coins << endl;
-        cout << p2.hand[0] << ", " << p2.hand[1] << endl;
+    if (p3.active == 1) { 
+        cardOnTop = 6; 
+        p3.ai = AiCharacter();
     }
-    if (p3.active == 1)
-    {
-        cout << "GRACZ 3: " << endl;
-        cout << "Zetony: " << p3.coins << endl;
-        cout << p3.hand[0] << ", " << p3.hand[1] << endl;
-    }
-    if (p4.active == 1)
-    {
-        cout << "GRACZ 4: " << endl;
-        cout << "Zetony: " << p4.coins << endl;
-        cout << p4.hand[0] << ", " << p4.hand[1] << endl;
+    if (p4.active == 1) { 
+        cardOnTop = 8; 
+        p4.ai = AiCharacter();
     }
 
-    for (int turn = 0; turn < 4; turn++) {
-        do {
-            CalculateHand(p1, turn);
-            cout << "Co robisz?: " << endl;
-            cout << "1. Sprawdz " << endl;
-            cout << "2. Postaw " << endl;
-            cout << "3. Pas " << endl;
-            cout << "4. Status " << endl;
-            string move;
-            cin >> move;
-            if (move == "1" || move == "Sprawdz") {
-                //Sprawdź
-                if (p1.coins >= currentBid) {
-                    int selectBid;
-                    if (currentBid > 0) {
-                        selectBid = currentBid;
-                    }
-                    else
-                    {
-                        selectBid = 2;
-                    }
-                    p1.coins -= selectBid;
-                    coinsOnTable += selectBid;
-                    currentBid = selectBid;
-                    p1.bid = currentBid;
-                    cout << "GRACZ 1 sprawdza i wpłaca " << selectBid << endl;
-                    Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
-                    Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
-                    Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
+    do {
+        //CalculateHand(p1, turn);
+        if (moveChoice == 1) {
+            //Sprawdź
+            if (p1.coins >= currentBid) {
+                int selectBid;
+                if (currentBid > 0) {
+                    selectBid = currentBid;
                 }
-            }
-            if (move == "2" || move == "Postaw") {
-                //Postaw
-                if (p1.coins >= currentBid) {
-                    int selectBid;
-                    cout << "Ile obstawiasz?: " << endl;
-                    cin >> selectBid;
-                    p1.coins -= selectBid;
-                    coinsOnTable += selectBid;
-                    currentBid += (selectBid - currentBid);
-                    cout << "GRACZ 1 stawia " << selectBid << " zetonow! " << endl;
-                    Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
-                    Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
-                    Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
+                else
+                {
+                    selectBid = 2;
                 }
-            }
-            if (move == "3" || move == "Pas") {
-                //Pas
-                p1.pass = 1;
-                cout << "GRACZ 1 pasuje" << endl;
+                p1.coins -= selectBid;
+                coinsOnTable += selectBid;
+                currentBid = selectBid;
+                p1.bid = currentBid;
+                cout << "GRACZ 1 sprawdza i wpłaca " << selectBid << endl;
                 Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
                 Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
                 Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
-                break;
             }
-            if (move == "4" || move == "Status") {
-                if (p1.active == 1)
-                {
-                    string passStatus;
-                    if (p1.pass == 0) {
-                        passStatus = "Aktywny ";
-                    }
-                    else { passStatus = "Spasowal "; }
-                    cout << "GRACZ 1: " << passStatus << endl;
-                    cout << "Zetony: " << p1.coins << endl;
-                    cout << p1.hand[0] << ", " << p1.hand[1] << endl;
-                }
-                if (p2.active == 1)
-                {
-                    string passStatus;
-                    if (p2.pass == 0) {
-                        passStatus = "Aktywny ";
-                    }
-                    else { passStatus = "Spasowal "; }
-                    cout << "GRACZ 2: " << passStatus << endl;
-                    cout << "Zetony: " << p2.coins << endl;
-                    cout << p2.hand[0] << ", " << p2.hand[1] << endl;
-                }
-                if (p3.active == 1)
-                {
-                    string passStatus;
-                    if (p3.pass == 0) {
-                        passStatus = "Aktywny ";
-                    }
-                    else { passStatus = "Spasowal "; }
-                    cout << "GRACZ 3: " << passStatus << endl;
-                    cout << "Zetony: " << p3.coins << endl;
-                    cout << p3.hand[0] << ", " << p3.hand[1] << endl;
-                }
-                if (p4.active == 1)
-                {
-                    string passStatus;
-                    if (p4.pass == 0) {
-                        passStatus = "Aktywny ";
-                    }
-                    else { passStatus = "Spasowal "; }
-                    cout << "GRACZ 4: " << passStatus << endl;
-                    cout << "Zetony: " << p4.coins << endl;
-                    cout << p4.hand[0] << ", " << p4.hand[1] << endl;
-                }
-                cout << "Zetony na stole: " << coinsOnTable << endl;
-                cout << "Obecny zaklad: " << currentBid << endl;
-                if (cardOnTop > 2 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << endl; }
-                if (cardOnTop > 4 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << cardOnTable[3] << endl; }
-                if (cardOnTop > 6 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << ", " << cardOnTable[3] << ", " << cardOnTable[4] << endl; }
+        }
+        if (moveChoice == 2) {
+            //Postaw
+            if (p1.coins >= currentBid) {
+                int selectBid;
+                cout << "Ile obstawiasz?: " << endl;
+                cin >> selectBid;
+                p1.coins -= selectBid;
+                coinsOnTable += selectBid;
+                currentBid += (selectBid - currentBid);
+                cout << "GRACZ 1 stawia " << selectBid << " zetonow! " << endl;
+                Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
+                Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
+                Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
             }
+        }
+        if (moveChoice == 3) {
+            //Pas
+            p1.pass = 1;
+            cout << "GRACZ 1 pasuje" << endl;
+            Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
+            Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
+            Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
+            break;
+        }
+        if (moveChoice == 4) {
+            if (p1.active == 1)
+            {
+                string passStatus;
+                if (p1.pass == 0) {
+                    passStatus = "Aktywny ";
+                }
+                else { passStatus = "Spasowal "; }
+                cout << "GRACZ 1: " << passStatus << endl;
+                cout << "Zetony: " << p1.coins << endl;
+                cout << p1.hand[0] << ", " << p1.hand[1] << endl;
+            }
+            if (p2.active == 1)
+            {
+                string passStatus;
+                if (p2.pass == 0) {
+                    passStatus = "Aktywny ";
+                }
+                else { passStatus = "Spasowal "; }
+                cout << "GRACZ 2: " << passStatus << endl;
+                cout << "Zetony: " << p2.coins << endl;
+                cout << p2.hand[0] << ", " << p2.hand[1] << endl;
+            }
+            if (p3.active == 1)
+            {
+                string passStatus;
+                if (p3.pass == 0) {
+                    passStatus = "Aktywny ";
+                }
+                else { passStatus = "Spasowal "; }
+                cout << "GRACZ 3: " << passStatus << endl;
+                cout << "Zetony: " << p3.coins << endl;
+                cout << p3.hand[0] << ", " << p3.hand[1] << endl;
+            }
+            if (p4.active == 1)
+            {
+                string passStatus;
+                if (p4.pass == 0) {
+                    passStatus = "Aktywny ";
+                }
+                else { passStatus = "Spasowal "; }
+                cout << "GRACZ 4: " << passStatus << endl;
+                cout << "Zetony: " << p4.coins << endl;
+                cout << p4.hand[0] << ", " << p4.hand[1] << endl;
+            }
+            cout << "Zetony na stole: " << coinsOnTable << endl;
+            cout << "Obecny zaklad: " << currentBid << endl;
+            if (cardOnTop > 2 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << endl; }
+            if (cardOnTop > 4 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << cardOnTable[3] << endl; }
+            if (cardOnTop > 6 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << ", " << cardOnTable[3] << ", " << cardOnTable[4] << endl; }
+        }
 
-            if (((p1.pass == 0 && p1.bid == currentBid) || (p1.pass == 1 && p1.bid != currentBid)) && ((p2.pass == 0 && p2.bid == currentBid) || (p2.pass == 1 && p2.bid != currentBid)) && ((p3.pass == 0 && p3.bid == currentBid) || (p3.pass == 1 && p3.bid != currentBid)) && ((p4.pass == 0 && p4.bid == currentBid) || (p4.pass == 1 && p4.bid != currentBid))) {
-                cout << "Rozdawanie kart... " << endl;
-                if (turn == 0)
-                {
-                    for (int x = 0; x < 3; x++) {
-                        if (cardStack[cardOnTop] == "") {
-                            cardOnTop++;
-                        }
-                        cout << "Karta: " << cardStack[cardOnTop] << ", " << cardOnTop << endl;
-                        cardOnTop++;
-                        cardOnTable.push_back(cardStack[cardOnTop]);
-                    }
-                }
-                if (turn == 1)
-                {
-                    if (cardStack[cardOnTop] == "") {
+        if (((p1.pass == 0 && p1.bid == currentBid) || (p1.pass == 1 && p1.bid != currentBid)) && ((p2.pass == 0 && p2.bid == currentBid) || (p2.pass == 1 && p2.bid != currentBid)) && ((p3.pass == 0 && p3.bid == currentBid) || (p3.pass == 1 && p3.bid != currentBid)) && ((p4.pass == 0 && p4.bid == currentBid) || (p4.pass == 1 && p4.bid != currentBid))) {
+            cout << "Rozdawanie kart... " << endl;
+            if (turn == 0) { lTurn = "0"; }
+            if (turn == 1)
+            {
+                for (int x = 0; x < 3; x++) {
+                    if (cards[cardOnTop].empty()) {
                         cardOnTop++;
                     }
-                    cout << "Karta: " << cardStack[cardOnTop] << ", " << cardOnTop << endl;
                     cardOnTop++;
-                    cardOnTable.push_back(cardStack[cardOnTop]);
+                    cardOnTable.push_back(cards[cardOnTop]);
                 }
-                if (turn == 2)
-                {
-                    if (cardStack[cardOnTop] == "") {
-                        cardOnTop++;
-                    }
-                    cout << "Karta: " << cardStack[cardOnTop] << ", " << cardOnTop << endl;
+                lTurn = "1";
+            }
+            if (turn == 2)
+            {
+                if (cards[cardOnTop] == "") {
                     cardOnTop++;
-                    cardOnTable.push_back(cardStack[cardOnTop]);
                 }
+                cout << "Karta: " << cards[cardOnTop] << ", " << cardOnTop << endl;
+                cardOnTop++;
+                cardOnTable.push_back(cards[cardOnTop]);
+                lTurn = "2";
             }
+            if (turn == 3)
+            {
+                if (cards[cardOnTop] == "") {
+                    cardOnTop++;
+                }
+                cout << "Karta: " << cards[cardOnTop] << ", " << cardOnTop << endl;
+                cardOnTop++;
+                cardOnTable.push_back(cards[cardOnTop]);
+                lTurn = "3";
+            }
+        }
 
-            //Ustalenie zwyciescy
-            if (p1.pass == 0 && p2.pass == 1 && p3.pass == 1 && p4.pass == 1) {
-                p1.coins += coinsOnTable;
-                coinsOnTable = 0;
-                cout << "Wygrywa Gracz 1! " << endl;
-                p2.pass = 0;
-                p3.pass = 0;
-                p4.pass = 0;
-                break;
-            }
-            else if (p1.pass == 1 && p2.pass == 0 && p3.pass == 1 && p4.pass == 1) {
-                p2.coins += coinsOnTable;
-                coinsOnTable = 0;
-                cout << "Wygrywa Gracz 2! " << endl;
-                p1.pass = 0;
-                p3.pass = 0;
-                p4.pass = 0;
-                break;
-            }
-            else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 0 && p4.pass == 1) {
-                p3.coins += coinsOnTable;
-                coinsOnTable = 0;
-                cout << "Wygrywa Gracz 3! " << endl;
-                p1.pass = 0;
-                p2.pass = 0;
-                p4.pass = 0;
-                break;
-            }
-            else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 1 && p4.pass == 0) {
-                p4.coins += coinsOnTable;
-                coinsOnTable = 0;
-                cout << "Wygrywa Gracz 4! " << endl;
-                p1.pass = 0;
-                p2.pass = 0;
-                p3.pass = 0;
-                break;
-            }
+        //Ustalenie zwyciescy
+        if (p1.pass == 0 && p2.pass == 1 && p3.pass == 1 && p4.pass == 1) {
+            p1.coins += coinsOnTable;
+            coinsOnTable = 0;
+            cout << "Wygrywa Gracz 1! " << endl;
+            p2.pass = 0;
+            p3.pass = 0;
+            p4.pass = 0;
+            break;
+        }
+        else if (p1.pass == 1 && p2.pass == 0 && p3.pass == 1 && p4.pass == 1) {
+            p2.coins += coinsOnTable;
+            coinsOnTable = 0;
+            cout << "Wygrywa Gracz 2! " << endl;
+            p1.pass = 0;
+            p3.pass = 0;
+            p4.pass = 0;
+            break;
+        }
+        else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 0 && p4.pass == 1) {
+            p3.coins += coinsOnTable;
+            coinsOnTable = 0;
+            cout << "Wygrywa Gracz 3! " << endl;
+            p1.pass = 0;
+            p2.pass = 0;
+            p4.pass = 0;
+            break;
+        }
+        else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 1 && p4.pass == 0) {
+            p4.coins += coinsOnTable;
+            coinsOnTable = 0;
+            cout << "Wygrywa Gracz 4! " << endl;
+            p1.pass = 0;
+            p2.pass = 0;
+            p3.pass = 0;
+            break;
+        }
 
-            if(p1.bid == currentBid && p1.pass == 0) { cout << "GRACZ 1 jeszcze gra! " << endl; }
-            if (p2.bid == currentBid && p2.pass == 0) { cout << "GRACZ 2 jeszcze gra! " << endl; }
-            if (p3.bid == currentBid && p3.pass == 0) { cout << "GRACZ 3 jeszcze gra! " << endl; }
-            if (p4.bid == currentBid && p4.pass == 0) { cout << "GRACZ 4 jeszcze gra! " << endl; }
+        if (p1.bid == currentBid && p1.pass == 0) { cout << "GRACZ 1 jeszcze gra! " << endl; }
+        if (p2.bid == currentBid && p2.pass == 0) { cout << "GRACZ 2 jeszcze gra! " << endl; }
+        if (p3.bid == currentBid && p3.pass == 0) { cout << "GRACZ 3 jeszcze gra! " << endl; }
+        if (p4.bid == currentBid && p4.pass == 0) { cout << "GRACZ 4 jeszcze gra! " << endl; }
 
-        } while ((p1.bid != currentBid || p1.pass != 0) && (p2.bid != currentBid || p2.pass != 0) && (p3.bid != currentBid || p3.pass != 0) && (p4.bid != currentBid || p4.pass != 0));
-        cout << "Koniec tury " << endl;
-    }
-    return 0;
-
+    } while ((p1.bid != currentBid || p1.pass != 0) && (p2.bid != currentBid || p2.pass != 0) && (p3.bid != currentBid || p3.pass != 0) && (p4.bid != currentBid || p4.pass != 0));
+    cout << "Koniec tury " << endl;
+    turn++;
+    return turn;
 }
+// KONIEC APKI OKIENKOWEJ //

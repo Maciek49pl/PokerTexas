@@ -30,7 +30,7 @@ HBITMAP hbKingOfClubs, hbKingOfDiamonds, hbKingOfHearts, hbKingOfSpades;
 
 HBITMAP hLogoImage, hCardImage, hGenerateImage;
 
-void LoadImages(HWND hWnd, Player p1, Player p2, Player p3, Player p4) {
+void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3, Player p4) {
     hLogoImage = (HBITMAP)LoadImageW(NULL, L"PokerCards\\test.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
     hbAceOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\AceOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
@@ -97,6 +97,20 @@ void LoadImages(HWND hWnd, Player p1, Player p2, Player p3, Player p4) {
     hbKingOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\KingOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hbKingOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\KingOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hbKingOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\KingOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    int cardOnTop = 0;
+    if (p1.active == 1) {
+        cardOnTop = 2;
+    }
+    if (p2.active == 1) {
+        cardOnTop = 4;
+    }
+    if (p3.active == 1) {
+        cardOnTop = 6;
+    }
+    if (p4.active == 1) {
+        cardOnTop = 8;
+    }
 
     int p1Hand0_x = 400 + 300, p1Hand0_y = 850;
 
@@ -2600,5 +2614,1665 @@ void LoadImages(HWND hWnd, Player p1, Player p2, Player p3, Player p4) {
     {
         hKingOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p4Hand1_x, p4Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
         SendMessageW(hKingOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
+    }
+}
+void LoadDealingCards(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4)
+{
+    hLogoImage = (HBITMAP)LoadImageW(NULL, L"PokerCards\\test.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbAceOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\AceOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbAceOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\AceOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbAceOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\AceOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbAceOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\AceOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbTwoOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\TwoOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbTwoOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\TwoOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbTwoOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\TwoOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbTwoOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\TwoOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbThreeOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\ThreeOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbThreeOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\ThreeOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbThreeOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\ThreeOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbThreeOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\ThreeOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbFourOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\FourOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbFourOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\FourOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbFourOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\FourOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbFourOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\FourOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbFiveOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\FiveOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbFiveOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\FiveOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbFiveOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\FiveOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbFiveOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\FiveOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbSixOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\SixOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbSixOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\SixOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbSixOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\SixOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbSixOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\SixOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbSevenOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\SevenOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbSevenOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\SevenOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbSevenOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\SevenOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbSevenOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\SevenOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbEightOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\EightOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbEightOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\EightOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbEightOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\EightOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbEightOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\EightOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbNineOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\NineOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbNineOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\NineOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbNineOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\NineOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbNineOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\NineOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbTenOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\TenOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbTenOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\TenOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbTenOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\TenOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbTenOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\TenOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbJackOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\JackOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbJackOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\JackOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbJackOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\JackOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbJackOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\JackOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbQueenOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\QueenOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbQueenOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\QueenOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbQueenOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\QueenOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbQueenOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\QueenOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    hbKingOfClubs = (HBITMAP)LoadImageW(NULL, L"PokerCards\\KingOfClubs.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbKingOfDiamonds = (HBITMAP)LoadImageW(NULL, L"PokerCards\\KingOfDiamonds.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbKingOfHearts = (HBITMAP)LoadImageW(NULL, L"PokerCards\\KingOfHearts.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hbKingOfSpades = (HBITMAP)LoadImageW(NULL, L"PokerCards\\KingOfSpades.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    int cardOnTop = 0;
+    if (p1.active == 1) {
+        cardOnTop = 2;
+    }
+    if (p2.active == 1) {
+        cardOnTop = 4;
+    }
+    if (p3.active == 1) {
+        cardOnTop = 6;
+    }
+    if (p4.active == 1) {
+        cardOnTop = 8;
+    }
+
+    if (turn == 1)
+    {
+
+        int cardOnTable0_x = 600, cardOnTable0_y = 350;
+
+        if (cards[cardOnTop] == "Ace of Clubs")
+        {
+            hAceOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Ace of Diamonds")
+        {
+            hAceOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfDiamonds);
+        }
+        if (cards[cardOnTop] == "Ace of Hearts")
+        {
+            hAceOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Ace of Spades")
+        {
+            hAceOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Two of Clubs")
+        {
+            hTwoOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Two of Diamonds")
+        {
+            hTwoOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Two of Hearts")
+        {
+            hTwoOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Two of Spades")
+        {
+            hTwoOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Three of Clubs")
+        {
+            hThreeOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Three of Diamonds")
+        {
+            hThreeOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Three of Hearts")
+        {
+            hThreeOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Three of Spades")
+        {
+            hThreeOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Four of Clubs")
+        {
+            hFourOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Four of Diamonds")
+        {
+            hFourOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Four of Hearts")
+        {
+            hFourOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Four of Spades")
+        {
+            hFourOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Five of Clubs")
+        {
+            hFiveOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Five of Diamonds")
+        {
+            hFiveOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Five of Hearts")
+        {
+            hFiveOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Five of Spades")
+        {
+            hFiveOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Six of Clubs")
+        {
+            hSixOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Six of Diamonds")
+        {
+            hSixOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Six of Hearts")
+        {
+            hSixOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Six of Spades")
+        {
+            hSixOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Seven of Clubs")
+        {
+            hSevenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Seven of Diamonds")
+        {
+            hSevenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Seven of Hearts")
+        {
+            hSevenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Seven of Spades")
+        {
+            hSevenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Eight of Clubs")
+        {
+            hEightOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Eight of Diamonds")
+        {
+            hEightOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Eight of Hearts")
+        {
+            hEightOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Eight of Spades")
+        {
+            hEightOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Nine of Clubs")
+        {
+            hNineOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Nine of Diamonds")
+        {
+            hNineOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Nine of Hearts")
+        {
+            hNineOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Nine of Spades")
+        {
+            hNineOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Ten of Clubs")
+        {
+            hTenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Ten of Diamonds")
+        {
+            hTenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Ten of Hearts")
+        {
+            hTenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Ten of Spades")
+        {
+            hTenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Jack of Clubs")
+        {
+            hJackOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Jack of Diamonds")
+        {
+            hJackOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Jack of Hearts")
+        {
+            hJackOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Jack of Spades")
+        {
+            hJackOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfSpades);
+        }
+
+        if (cards[cardOnTop] == "Queen of Clubs")
+        {
+            hQueenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfClubs);
+        }
+
+        if (cards[cardOnTop] == "Queen of Diamonds")
+        {
+            hQueenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "Queen of Hearts")
+        {
+            hQueenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfHearts);
+        }
+
+        if (cards[cardOnTop] == "Queen of Spades")
+        {
+            hQueenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfSpades);
+        }
+
+        if (cards[cardOnTop] == "King of Clubs")
+        {
+            hKingOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfClubs);
+        }
+
+        if (cards[cardOnTop] == "King of Diamonds")
+        {
+            hKingOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfDiamonds);
+        }
+
+        if (cards[cardOnTop] == "King of Hearts")
+        {
+            hKingOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfHearts);
+        }
+
+        if (cards[cardOnTop] == "King of Spades")
+        {
+            hKingOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable0_x, cardOnTable0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
+        }
+
+        int cardOnTable1_x = 700, cardOnTable1_y = 350;
+
+        if (cards[cardOnTop + 1] == "Ace of Clubs")
+        {
+            hAceOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Ace of Diamonds")
+        {
+            hAceOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfDiamonds);
+        }
+        if (cards[cardOnTop + 1] == "Ace of Hearts")
+        {
+            hAceOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Ace of Spades")
+        {
+            hAceOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Two of Clubs")
+        {
+            hTwoOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Two of Diamonds")
+        {
+            hTwoOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Two of Hearts")
+        {
+            hTwoOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Two of Spades")
+        {
+            hTwoOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Three of Clubs")
+        {
+            hThreeOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Three of Diamonds")
+        {
+            hThreeOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Three of Hearts")
+        {
+            hThreeOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Three of Spades")
+        {
+            hThreeOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Four of Clubs")
+        {
+            hFourOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Four of Diamonds")
+        {
+            hFourOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Four of Hearts")
+        {
+            hFourOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Four of Spades")
+        {
+            hFourOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Five of Clubs")
+        {
+            hFiveOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Five of Diamonds")
+        {
+            hFiveOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Five of Hearts")
+        {
+            hFiveOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Five of Spades")
+        {
+            hFiveOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Six of Clubs")
+        {
+            hSixOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Six of Diamonds")
+        {
+            hSixOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Six of Hearts")
+        {
+            hSixOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Six of Spades")
+        {
+            hSixOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Seven of Clubs")
+        {
+            hSevenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Seven of Diamonds")
+        {
+            hSevenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Seven of Hearts")
+        {
+            hSevenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Seven of Spades")
+        {
+            hSevenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Eight of Clubs")
+        {
+            hEightOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Eight of Diamonds")
+        {
+            hEightOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Eight of Hearts")
+        {
+            hEightOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Eight of Spades")
+        {
+            hEightOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Nine of Clubs")
+        {
+            hNineOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Nine of Diamonds")
+        {
+            hNineOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Nine of Hearts")
+        {
+            hNineOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Nine of Spades")
+        {
+            hNineOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Ten of Clubs")
+        {
+            hTenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Ten of Diamonds")
+        {
+            hTenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Ten of Hearts")
+        {
+            hTenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Ten of Spades")
+        {
+            hTenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Jack of Clubs")
+        {
+            hJackOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Jack of Diamonds")
+        {
+            hJackOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Jack of Hearts")
+        {
+            hJackOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Jack of Spades")
+        {
+            hJackOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "Queen of Clubs")
+        {
+            hQueenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "Queen of Diamonds")
+        {
+            hQueenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "Queen of Hearts")
+        {
+            hQueenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "Queen of Spades")
+        {
+            hQueenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfSpades);
+        }
+
+        if (cards[cardOnTop + 1] == "King of Clubs")
+        {
+            hKingOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfClubs);
+        }
+
+        if (cards[cardOnTop + 1] == "King of Diamonds")
+        {
+            hKingOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 1] == "King of Hearts")
+        {
+            hKingOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfHearts);
+        }
+
+        if (cards[cardOnTop + 1] == "King of Spades")
+        {
+            hKingOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable1_x, cardOnTable1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
+        }
+
+        int cardOnTable2_x = 800, cardOnTable2_y = 350;
+
+        if (cards[cardOnTop + 2] == "Ace of Clubs")
+        {
+            hAceOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Ace of Diamonds")
+        {
+            hAceOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfDiamonds);
+        }
+        if (cards[cardOnTop + 2] == "Ace of Hearts")
+        {
+            hAceOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Ace of Spades")
+        {
+            hAceOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Two of Clubs")
+        {
+            hTwoOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Two of Diamonds")
+        {
+            hTwoOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Two of Hearts")
+        {
+            hTwoOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Two of Spades")
+        {
+            hTwoOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Three of Clubs")
+        {
+            hThreeOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Three of Diamonds")
+        {
+            hThreeOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Three of Hearts")
+        {
+            hThreeOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Three of Spades")
+        {
+            hThreeOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Four of Clubs")
+        {
+            hFourOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Four of Diamonds")
+        {
+            hFourOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Four of Hearts")
+        {
+            hFourOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Four of Spades")
+        {
+            hFourOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Five of Clubs")
+        {
+            hFiveOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Five of Diamonds")
+        {
+            hFiveOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Five of Hearts")
+        {
+            hFiveOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Five of Spades")
+        {
+            hFiveOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Six of Clubs")
+        {
+            hSixOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Six of Diamonds")
+        {
+            hSixOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Six of Hearts")
+        {
+            hSixOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Six of Spades")
+        {
+            hSixOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Seven of Clubs")
+        {
+            hSevenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Seven of Diamonds")
+        {
+            hSevenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Seven of Hearts")
+        {
+            hSevenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Seven of Spades")
+        {
+            hSevenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Eight of Clubs")
+        {
+            hEightOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Eight of Diamonds")
+        {
+            hEightOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Eight of Hearts")
+        {
+            hEightOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Eight of Spades")
+        {
+            hEightOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Nine of Clubs")
+        {
+            hNineOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Nine of Diamonds")
+        {
+            hNineOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Nine of Hearts")
+        {
+            hNineOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Nine of Spades")
+        {
+            hNineOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Ten of Clubs")
+        {
+            hTenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Ten of Diamonds")
+        {
+            hTenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Ten of Hearts")
+        {
+            hTenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Ten of Spades")
+        {
+            hTenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Jack of Clubs")
+        {
+            hJackOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Jack of Diamonds")
+        {
+            hJackOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Jack of Hearts")
+        {
+            hJackOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Jack of Spades")
+        {
+            hJackOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "Queen of Clubs")
+        {
+            hQueenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "Queen of Diamonds")
+        {
+            hQueenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "Queen of Hearts")
+        {
+            hQueenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "Queen of Spades")
+        {
+            hQueenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfSpades);
+        }
+
+        if (cards[cardOnTop + 2] == "King of Clubs")
+        {
+            hKingOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfClubs);
+        }
+
+        if (cards[cardOnTop + 2] == "King of Diamonds")
+        {
+            hKingOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 2] == "King of Hearts")
+        {
+            hKingOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfHearts);
+        }
+
+        if (cards[cardOnTop + 2] == "King of Spades")
+        {
+            hKingOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable2_x, cardOnTable2_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
+        }
+    }
+
+    if (turn == 2)
+    {
+
+        int cardOnTable3_x = 900, cardOnTable3_y = 350;
+
+        if (cards[cardOnTop + 3] == "Ace of Clubs")
+        {
+            hAceOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Ace of Diamonds")
+        {
+            hAceOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfDiamonds);
+        }
+        if (cards[cardOnTop + 3] == "Ace of Hearts")
+        {
+            hAceOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Ace of Spades")
+        {
+            hAceOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Two of Clubs")
+        {
+            hTwoOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Two of Diamonds")
+        {
+            hTwoOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Two of Hearts")
+        {
+            hTwoOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Two of Spades")
+        {
+            hTwoOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Three of Clubs")
+        {
+            hThreeOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Three of Diamonds")
+        {
+            hThreeOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Three of Hearts")
+        {
+            hThreeOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Three of Spades")
+        {
+            hThreeOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Four of Clubs")
+        {
+            hFourOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Four of Diamonds")
+        {
+            hFourOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Four of Hearts")
+        {
+            hFourOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Four of Spades")
+        {
+            hFourOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Five of Clubs")
+        {
+            hFiveOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Five of Diamonds")
+        {
+            hFiveOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Five of Hearts")
+        {
+            hFiveOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Five of Spades")
+        {
+            hFiveOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Six of Clubs")
+        {
+            hSixOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Six of Diamonds")
+        {
+            hSixOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Six of Hearts")
+        {
+            hSixOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Six of Spades")
+        {
+            hSixOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Seven of Clubs")
+        {
+            hSevenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Seven of Diamonds")
+        {
+            hSevenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Seven of Hearts")
+        {
+            hSevenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Seven of Spades")
+        {
+            hSevenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Eight of Clubs")
+        {
+            hEightOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Eight of Diamonds")
+        {
+            hEightOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Eight of Hearts")
+        {
+            hEightOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Eight of Spades")
+        {
+            hEightOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Nine of Clubs")
+        {
+            hNineOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Nine of Diamonds")
+        {
+            hNineOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Nine of Hearts")
+        {
+            hNineOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Nine of Spades")
+        {
+            hNineOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Ten of Clubs")
+        {
+            hTenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Ten of Diamonds")
+        {
+            hTenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Ten of Hearts")
+        {
+            hTenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Ten of Spades")
+        {
+            hTenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Jack of Clubs")
+        {
+            hJackOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Jack of Diamonds")
+        {
+            hJackOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Jack of Hearts")
+        {
+            hJackOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Jack of Spades")
+        {
+            hJackOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "Queen of Clubs")
+        {
+            hQueenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "Queen of Diamonds")
+        {
+            hQueenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "Queen of Hearts")
+        {
+            hQueenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "Queen of Spades")
+        {
+            hQueenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfSpades);
+        }
+
+        if (cards[cardOnTop + 3] == "King of Clubs")
+        {
+            hKingOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfClubs);
+        }
+
+        if (cards[cardOnTop + 3] == "King of Diamonds")
+        {
+            hKingOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 3] == "King of Hearts")
+        {
+            hKingOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfHearts);
+        }
+
+        if (cards[cardOnTop + 3] == "King of Spades")
+        {
+            hKingOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable3_x, cardOnTable3_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
+        }
+    }
+
+    if (turn == 3)
+    {
+
+        int cardOnTable4_x = 1000, cardOnTable4_y = 350;
+
+        if (cards[cardOnTop + 4] == "Ace of Clubs")
+        {
+            hAceOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Ace of Diamonds")
+        {
+            hAceOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfDiamonds);
+        }
+        if (cards[cardOnTop + 4] == "Ace of Hearts")
+        {
+            hAceOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Ace of Spades")
+        {
+            hAceOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hAceOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Two of Clubs")
+        {
+            hTwoOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Two of Diamonds")
+        {
+            hTwoOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Two of Hearts")
+        {
+            hTwoOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Two of Spades")
+        {
+            hTwoOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTwoOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTwoOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Three of Clubs")
+        {
+            hThreeOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Three of Diamonds")
+        {
+            hThreeOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Three of Hearts")
+        {
+            hThreeOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Three of Spades")
+        {
+            hThreeOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hThreeOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbThreeOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Four of Clubs")
+        {
+            hFourOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Four of Diamonds")
+        {
+            hFourOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Four of Hearts")
+        {
+            hFourOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Four of Spades")
+        {
+            hFourOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFourOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFourOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Five of Clubs")
+        {
+            hFiveOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Five of Diamonds")
+        {
+            hFiveOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Five of Hearts")
+        {
+            hFiveOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Five of Spades")
+        {
+            hFiveOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hFiveOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbFiveOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Six of Clubs")
+        {
+            hSixOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Six of Diamonds")
+        {
+            hSixOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Six of Hearts")
+        {
+            hSixOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Six of Spades")
+        {
+            hSixOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSixOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSixOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Seven of Clubs")
+        {
+            hSevenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Seven of Diamonds")
+        {
+            hSevenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Seven of Hearts")
+        {
+            hSevenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Seven of Spades")
+        {
+            hSevenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hSevenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbSevenOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Eight of Clubs")
+        {
+            hEightOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Eight of Diamonds")
+        {
+            hEightOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Eight of Hearts")
+        {
+            hEightOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Eight of Spades")
+        {
+            hEightOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hEightOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbEightOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Nine of Clubs")
+        {
+            hNineOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Nine of Diamonds")
+        {
+            hNineOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Nine of Hearts")
+        {
+            hNineOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Nine of Spades")
+        {
+            hNineOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hNineOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbNineOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Ten of Clubs")
+        {
+            hTenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Ten of Diamonds")
+        {
+            hTenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Ten of Hearts")
+        {
+            hTenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Ten of Spades")
+        {
+            hTenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hTenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbTenOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Jack of Clubs")
+        {
+            hJackOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Jack of Diamonds")
+        {
+            hJackOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Jack of Hearts")
+        {
+            hJackOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Jack of Spades")
+        {
+            hJackOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hJackOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbJackOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "Queen of Clubs")
+        {
+            hQueenOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "Queen of Diamonds")
+        {
+            hQueenOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "Queen of Hearts")
+        {
+            hQueenOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "Queen of Spades")
+        {
+            hQueenOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hQueenOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbQueenOfSpades);
+        }
+
+        if (cards[cardOnTop + 4] == "King of Clubs")
+        {
+            hKingOfClubs = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfClubs, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfClubs);
+        }
+
+        if (cards[cardOnTop + 4] == "King of Diamonds")
+        {
+            hKingOfDiamonds = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfDiamonds, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfDiamonds);
+        }
+
+        if (cards[cardOnTop + 4] == "King of Hearts")
+        {
+            hKingOfHearts = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfHearts, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfHearts);
+        }
+
+        if (cards[cardOnTop + 4] == "King of Spades")
+        {
+            hKingOfSpades = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, cardOnTable4_x, cardOnTable4_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+            SendMessageW(hKingOfSpades, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
+        }
     }
 }
