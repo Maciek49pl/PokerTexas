@@ -9,7 +9,7 @@ int Player::AiMove(int nr, int ai, int currentBid, int playerBid) {
         }
         else {
             //check or pass
-            move = rand() % 1;
+            move = rand() % 2;
         }
     }
 

@@ -1,25 +1,5 @@
 ﻿#include "poker.h"
 
-#define IDC_COINS 100
-#define IDC_OUT 101
-
-#define FILE_MENU_NEW 1
-#define FILE_MENU_OPEN 2
-#define FILE_MENU_EXIT 3
-#define GENERATE_BUTTON 4
-
-#define ONE_PLAYER 5
-#define TWO_PLAYER 6
-#define THREE_PLAYER 7
-#define FOUR_PLAYER 8
-#define SELECT_COINS 9
-#define START_GAME 10
-
-#define CHECK 200
-#define BET 201
-#define PASS 202
-#define WAIT 203
-
 // a = Clubs
 // b = Diamonds
 // c = Hearts
@@ -79,25 +59,6 @@ int AiCharacter() {
     //ai = rand() % 2;
     ai = 0;
     return ai;
-}
-
-void Ai(Player p, int nr, int ai, int turn, int &aiMove,int &pass, int &currentBid, int &coins, int &playerBid){
-    if (pass == 0)
-    {
-        aiMove = p.AiMove(nr, ai, currentBid, playerBid);
-        if (aiMove == 0) {
-            coinsOnTable = p.AiCheck(nr, coinsOnTable, currentBid, coins, playerBid);
-        }
-        else if (aiMove == 1) {
-            p.pass = p.AiPass(nr, pass);
-        }
-        else if (aiMove == 2) {
-            p.AiWait(nr);
-        }
-        else if (aiMove == 3) {
-            currentBid = p.AiBet(nr, coinsOnTable, currentBid, coins);
-        }
-    }
 }
 
 vector<string> CardGeneration(HWND hWnd) {
@@ -184,7 +145,7 @@ vector<string> CardGeneration(HWND hWnd) {
         string str = CardName[x];
         wstring temp = wstring(str.begin(), str.end());
         LPCWSTR text = temp.c_str();
-        CreateWindowW(L"Static",text, WS_VISIBLE | WS_CHILD, 0, 16+(x*20), 150, 16, hWnd, NULL, NULL, NULL); // statyczny tekst
+        CreateWindowW(L"Static", text, WS_VISIBLE | WS_CHILD, 0, 16 + (x * 20), 150, 16, hWnd, NULL, NULL, NULL); // statyczny tekst
     }
     cout << "Talia kompletna! \n";
 
@@ -497,6 +458,7 @@ HWND hWindowCoins0, hWindowCoins1, hWindowCoins2, hWindowCoins3, hWindowCoins4;
 HWND hCoins, hOut, hPlayers, hLogo, hCard, hCard1;
 HWND hP1Coins, hP2Coins, hP3Coins, hP4Coins;
 HWND hP1Bet, hP2Bet, hP3Bet, hP4Bet;
+HWND hCoinsOnTable, hCurrentBet, hSetBet;
 HMENU hMenu;
 
 HWND hCheck, hBet, hWait, hPass;
@@ -527,7 +489,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
     wc.hInstance = hInst;
     wc.lpszClassName = L"myWindowClass"; //definiuje nazwe klasy
     wc.lpfnWndProc = WindowProcedure; //definiuje proces okna
-    
+
     if (!RegisterClassW(&wc)) {
         return -1;
     }
@@ -655,8 +617,8 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         AddMenus(hWnd);
         break;
     case WM_DESTROY:
-            PostQuitMessage(0);
-            break;
+        PostQuitMessage(0);
+        break;
     default:
         return DefWindowProcW(hWnd, msg, wp, lp);
     }
@@ -675,30 +637,30 @@ void AddMenus(HWND hWnd) {
     AppendMenu(hFileMenu, MF_SEPARATOR, NULL, NULL);
     AppendMenu(hFileMenu, MF_STRING, FILE_MENU_EXIT, L"Exit");
 
-    AppendMenu(hMenu, MF_POPUP,(UINT_PTR)hFileMenu, L"File"); // dodaje FILE do okienka
-    AppendMenu(hMenu, MF_STRING, 2, L"Help"); 
+    AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hFileMenu, L"File"); // dodaje FILE do okienka
+    AppendMenu(hMenu, MF_STRING, 2, L"Help");
 
     SetMenu(hWnd, hMenu); //Ustawia menu
 }
 
 void AddControls(HWND hWnd) {
-   hWindowPlayers0 = CreateWindowW(L"Static", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, 290, 40, 240, 150, hWnd, NULL, NULL, NULL); // statyczny tekst
-   hWindowPlayers1 = CreateWindowW(L"Static", L"Wybierz Liczbę graczy: ", WS_VISIBLE | WS_CHILD, 330, 50, 180, 80, hWnd, NULL, NULL, NULL); // statyczny tekst
-   hWindowPlayers2 = CreateWindowW(L"Button", L"1", WS_VISIBLE | WS_CHILD | WS_BORDER, 300, 80, 50, 30, hWnd, (HMENU)ONE_PLAYER, NULL, NULL); // Przycisk
-   hWindowPlayers3 = CreateWindowW(L"Button", L"2", WS_VISIBLE | WS_CHILD | WS_BORDER, 350, 80, 50, 30, hWnd, (HMENU)TWO_PLAYER, NULL, NULL); // Przycisk
-   hWindowPlayers4 = CreateWindowW(L"Button", L"3", WS_VISIBLE | WS_CHILD | WS_BORDER, 400, 80, 50, 30, hWnd, (HMENU)THREE_PLAYER, NULL, NULL); // Przycisk
-   hWindowPlayers5 = CreateWindowW(L"Button", L"4", WS_VISIBLE | WS_CHILD | WS_BORDER, 450, 80, 50, 30, hWnd, (HMENU)FOUR_PLAYER, NULL, NULL); // Przycisk
-   hWindowPlayers6 = CreateWindowW(L"Static", L"Liczba graczy: ", WS_VISIBLE | WS_CHILD, 300, 120, 100, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
-   hPlayers = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD, 400, 120, 100, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+    hWindowPlayers0 = CreateWindowW(L"Static", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, 290, 40, 240, 150, hWnd, NULL, NULL, NULL); // statyczny tekst
+    hWindowPlayers1 = CreateWindowW(L"Static", L"Wybierz Liczbę graczy: ", WS_VISIBLE | WS_CHILD, 330, 50, 180, 80, hWnd, NULL, NULL, NULL); // statyczny tekst
+    hWindowPlayers2 = CreateWindowW(L"Button", L"1", WS_VISIBLE | WS_CHILD | WS_BORDER, 300, 80, 50, 30, hWnd, (HMENU)ONE_PLAYER, NULL, NULL); // Przycisk
+    hWindowPlayers3 = CreateWindowW(L"Button", L"2", WS_VISIBLE | WS_CHILD | WS_BORDER, 350, 80, 50, 30, hWnd, (HMENU)TWO_PLAYER, NULL, NULL); // Przycisk
+    hWindowPlayers4 = CreateWindowW(L"Button", L"3", WS_VISIBLE | WS_CHILD | WS_BORDER, 400, 80, 50, 30, hWnd, (HMENU)THREE_PLAYER, NULL, NULL); // Przycisk
+    hWindowPlayers5 = CreateWindowW(L"Button", L"4", WS_VISIBLE | WS_CHILD | WS_BORDER, 450, 80, 50, 30, hWnd, (HMENU)FOUR_PLAYER, NULL, NULL); // Przycisk
+    hWindowPlayers6 = CreateWindowW(L"Static", L"Liczba graczy: ", WS_VISIBLE | WS_CHILD, 300, 120, 100, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+    hPlayers = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD, 400, 120, 100, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-   hWindowCoins0 = CreateWindowW(L"Static", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, 290, 200, 240, 150, hWnd, NULL, NULL, NULL); // statyczny tekst
-   hWindowCoins1 = CreateWindowW(L"Static", L"Podaj liczbe żetonów: ", WS_VISIBLE | WS_CHILD, 330, 210, 180, 80, hWnd, NULL, NULL, NULL); // statyczny tekst
-   hCoins = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 340, 230, 120, 20, hWnd, NULL, NULL, NULL); // tekst z edycją
-   hWindowCoins2 = CreateWindowW(L"Button", L"Wybierz", WS_VISIBLE | WS_CHILD | WS_BORDER, 365, 255, 70, 40, hWnd, (HMENU)SELECT_COINS, NULL, NULL); // Przycisk
-   hWindowCoins3 = CreateWindowW(L"Static", L"Liczba żetonów: ", WS_VISIBLE | WS_CHILD, 300, 310, 120, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
-   hOut = CreateWindow(L"Static", L"", WS_VISIBLE | WS_CHILD, 430, 310, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+    hWindowCoins0 = CreateWindowW(L"Static", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, 290, 200, 240, 150, hWnd, NULL, NULL, NULL); // statyczny tekst
+    hWindowCoins1 = CreateWindowW(L"Static", L"Podaj liczbe żetonów: ", WS_VISIBLE | WS_CHILD, 330, 210, 180, 80, hWnd, NULL, NULL, NULL); // statyczny tekst
+    hCoins = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 340, 230, 120, 20, hWnd, NULL, NULL, NULL); // tekst z edycją
+    hWindowCoins2 = CreateWindowW(L"Button", L"Wybierz", WS_VISIBLE | WS_CHILD | WS_BORDER, 365, 255, 70, 40, hWnd, (HMENU)SELECT_COINS, NULL, NULL); // Przycisk
+    hWindowCoins3 = CreateWindowW(L"Static", L"Liczba żetonów: ", WS_VISIBLE | WS_CHILD, 300, 310, 120, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+    hOut = CreateWindow(L"Static", L"", WS_VISIBLE | WS_CHILD, 430, 310, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-   hWindowCoins4 = CreateWindowW(L"Button", L"START", WS_VISIBLE | WS_CHILD | WS_BORDER, 365, 400, 70, 40, hWnd, (HMENU)START_GAME, NULL, NULL); // Przycisk
+    hWindowCoins4 = CreateWindowW(L"Button", L"START", WS_VISIBLE | WS_CHILD | WS_BORDER, 365, 400, 70, 40, hWnd, (HMENU)START_GAME, NULL, NULL); // Przycisk
 }
 
 void StartGame(HWND hWnd) {
@@ -710,14 +672,14 @@ void StartGame(HWND hWnd) {
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
     }
     if (players == "2") {
         CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
         CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
@@ -730,7 +692,7 @@ void StartGame(HWND hWnd) {
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
         CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
@@ -742,15 +704,14 @@ void StartGame(HWND hWnd) {
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP3Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-        hP3Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 580, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
-
+        hP3Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 580, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
     }
     if (players == "4") {
         CreateWindowW(L"Static", L"GRACZ 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 750, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP1Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 780, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP1Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 680, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
         CreateWindowW(L"Static", L"GRACZ 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 250 + 100, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
@@ -762,37 +723,81 @@ void StartGame(HWND hWnd) {
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 450 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP3Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 50, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-        hP3Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 250, 580, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP3Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 580, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
         CreateWindowW(L"Static", L"GRACZ 4", WS_VISIBLE | WS_CHILD | WS_BORDER, 650 + 800, 400 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         CreateWindowW(L"Static", L"$: ", WS_VISIBLE | WS_CHILD | WS_BORDER, 650 + 800, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
         hP4Coins = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 670 + 800, 430 - 20, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
 
-        hP4Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 630, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
+        hP4Bet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 400, 630, 70, 25, hWnd, NULL, NULL, NULL); // statyczny tekst
     }
     if (p1.active == 1) {
-        p1.coins = (int)coins;
+        p1.coins = stoi(coins);
         SetWindowTextA(hP1Coins, coins);
     }
     if (p2.active == 1) {
-        p2.coins = (int)coins;
+        p2.coins = stoi(coins);
         SetWindowTextA(hP2Coins, coins);
     }
     if (p3.active == 1) {
-        p3.coins = (int)coins;
+        p3.coins = stoi(coins);
         SetWindowTextA(hP3Coins, coins);
     }
     if (p4.active == 1) {
-        p4.coins = (int)coins;
+        p4.coins = stoi(coins);
         SetWindowTextA(hP4Coins, coins);
     }
 
+    hCoinsOnTable = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 470 + 300, 630, 70, 25, hWnd, (HMENU)CHECK, NULL, NULL); // Przycisk
+
     hCheck = CreateWindowW(L"Button", L"Sprawdź", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 850, 100, 30, hWnd, (HMENU)CHECK, NULL, NULL); // Przycisk
+    hCurrentBet = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 1060, 850, 100, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
     hBet = CreateWindowW(L"Button", L"Postaw", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 880, 100, 30, hWnd, (HMENU)BET, NULL, NULL); // Przycisk
+    hSetBet = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 1050, 880, 120, 20, hWnd, NULL, NULL, NULL); // tekst z edycją
+
     hPass = CreateWindowW(L"Button", L"Pas", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 910, 100, 30, hWnd, (HMENU)PASS, NULL, NULL); // Przycisk
     hWait = CreateWindowW(L"Button", L"Czekaj", WS_VISIBLE | WS_CHILD | WS_BORDER, 950, 940, 100, 30, hWnd, (HMENU)WAIT, NULL, NULL); // Przycisk
 
     hTurn = CreateWindowW(L"Static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 1250, 650, 50, 30, hWnd, NULL, NULL, NULL); // Przycisk
+}
+
+void Ai(Player p, HWND hPBet, HWND hPCoins, int nr, int ai, int turn, int& aiMove, int& pass, int& currentBid, int& coins, int& playerBid) {
+    if (pass == 0)
+    {
+        char setCoins[30];
+        GetWindowTextA(hPCoins, setCoins, 30);
+        aiMove = p.AiMove(nr, ai, currentBid, playerBid);
+        if (aiMove == 0) {
+            coins = stoi(setCoins);
+            coinsOnTable = p.AiCheck(nr, coinsOnTable, currentBid, coins, playerBid);
+            string sCoinsOnTable = to_string(coinsOnTable);
+            LPCSTR lCoinsOnTable = sCoinsOnTable.c_str();
+            SetWindowTextA(hCoinsOnTable, lCoinsOnTable);
+            string sBid = to_string(currentBid);
+            LPCSTR bid = sBid.c_str();
+            SetWindowTextA(hPBet, bid);
+            string sCoins = to_string(coins);
+            LPCSTR lCoins = sCoins.c_str();
+            SetWindowTextA(hPCoins, lCoins);
+        }
+        else if (aiMove == 1) {
+            p.pass = p.AiPass(nr, pass);
+        }
+        else if (aiMove == 2) {
+            p.AiWait(nr);
+        }
+        else if (aiMove == 3) {
+            coins = stoi(setCoins);
+            currentBid = p.AiBet(nr, coinsOnTable, currentBid, coins);
+            string sBid = to_string(currentBid);
+            LPCSTR bid = sBid.c_str();
+            SetWindowTextA(hPBet, bid);
+            string sCurrentBid = to_string(currentBid);
+            LPCSTR lBid = sCurrentBid.c_str();
+            SetWindowTextA(hCurrentBet, lBid);
+        }
+    }
 }
 
 void DealingCards(vector<string> cards) {
@@ -886,47 +891,74 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
         //CalculateHand(p1, turn);
         if (moveChoice == 1) {
             //Sprawdź
+            char setBet[30];
+            GetWindowTextA(hP1Bet, setBet, 30);
+            char setCoins[30];
+            GetWindowTextA(hP1Coins, setCoins, 30);
             if (p1.coins >= currentBid) {
                 int selectBid;
                 if (currentBid > 0) {
-                    selectBid = currentBid;
+                    selectBid = stoi(setBet);
                 }
                 else
                 {
                     selectBid = 2;
                 }
-                p1.coins -= selectBid;
+                p1.coins = stoi(setCoins);
                 coinsOnTable += selectBid;
                 currentBid = selectBid;
                 p1.bid = currentBid;
+                p1.coins -= p1.bid;
+                string sCoinsOnTable = to_string(coinsOnTable);
+                LPCSTR lCoinsOnTable = sCoinsOnTable.c_str();
+                SetWindowTextA(hCoinsOnTable, lCoinsOnTable);
+                string sCurrentBid = to_string(currentBid);
+                LPCSTR lCurrentBid = sCurrentBid.c_str();
+                SetWindowTextA(hP1Bet, lCurrentBid);
+                string sCoins = to_string(p1.coins);
+                LPCSTR lCoins = sCoins.c_str();
+                SetWindowTextA(hP1Coins, lCoins);
                 cout << "GRACZ 1 sprawdza i wpłaca " << selectBid << endl;
-                Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
-                Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
-                Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
+                Ai(p2, hP2Bet, hP2Coins, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
+                Ai(p3, hP3Bet, hP3Coins, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
+                Ai(p4, hP4Bet, hP4Coins, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
             }
         }
         if (moveChoice == 2) {
             //Postaw
+            char setBet[30];
+            GetWindowTextA(hSetBet, setBet , 30);
+            char setCoins[30];
+            GetWindowTextA(hP1Coins, setCoins, 30);
             if (p1.coins >= currentBid) {
-                int selectBid;
-                cout << "Ile obstawiasz?: " << endl;
-                cin >> selectBid;
-                p1.coins -= selectBid;
+                p1.coins = stoi(setCoins);
+                int selectBid = stoi(setBet);
                 coinsOnTable += selectBid;
-                currentBid += (selectBid - currentBid);
+                currentBid += selectBid;
+                p1.bid = currentBid;
+                p1.coins -= p1.bid;
+                string sCoinsOnTable = to_string(coinsOnTable);
+                LPCSTR lCoinsOnTable = sCoinsOnTable.c_str();
+                SetWindowTextA(hCoinsOnTable, lCoinsOnTable);
+                string sCurrentBid = to_string(currentBid);
+                LPCSTR lCurrentBid = sCurrentBid.c_str();
+                SetWindowTextA(hP1Bet, lCurrentBid);
+                string sCoins = to_string(p1.coins);
+                LPCSTR lCoins = sCoins.c_str();
+                SetWindowTextA(hP1Coins, lCoins);
                 cout << "GRACZ 1 stawia " << selectBid << " zetonow! " << endl;
-                Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
-                Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
-                Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
+                Ai(p2, hP2Bet, hP2Coins, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
+                Ai(p3, hP3Bet, hP3Coins, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
+                Ai(p4, hP4Bet, hP4Coins, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
             }
         }
         if (moveChoice == 3) {
             //Pas
             p1.pass = 1;
             cout << "GRACZ 1 pasuje" << endl;
-            Ai(p2, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
-            Ai(p3, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
-            Ai(p4, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
+            Ai(p2, hP2Bet, hP2Coins, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
+            Ai(p3, hP3Bet, hP3Coins, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
+            Ai(p4, hP4Bet, hP4Coins, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
             break;
         }
         if (moveChoice == 4) {

@@ -127,9 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="getCards.cpp" />
+    <ClCompile Include="cardGeneration.cpp" />
+    <ClCompile Include="getAi.cpp" />
     <ClCompile Include="PokerTexas.cpp" />
     <ClCompile Include="getImages.cpp" />
+    <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="poker.h" />
