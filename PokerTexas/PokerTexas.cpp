@@ -1,38 +1,8 @@
 ﻿#include "poker.h"
 
-// a = Clubs
-// b = Diamonds
-// c = Hearts
-// d = Spades
-
-// 0 = Ace
-// 1 = Two
-// 2 = Three
-// 3 = Four
-// 4 = Five
-// 5 = Six
-// 6 = Seven
-// 7 = Eight
-// 8 = Nine
-// 9 = Ten
-// 10 = Jack
-// 11 = Queen
-// 12 = King
-
-struct cardStruct {
-    int cardNr;
-    int cardIndex;
-    char cardSuit;
-};
-vector<cardStruct> Card;
-vector<string> CardName;
-
 Player p1, p2, p3, p4;
-
-vector<string> cardStack(CardName.size());
-vector<int> cardUsed(CardName.size());
-
 vector<string> cardOnTable;
+
 int coinsOnTable;
 int currentBid;
 
@@ -47,131 +17,6 @@ int player3CardCount = 0;
 
 int player4Active = 0;
 int player4CardCount = 0;
-
-int AiCharacter() {
-    //0 - Spokojny
-    //1 - Agresyny
-    //2 - Pasywny
-    //3 - Chaotyczny
-    //4 - 
-    //5 -
-    int ai;
-    //ai = rand() % 2;
-    ai = 0;
-    return ai;
-}
-
-vector<string> CardGeneration(HWND hWnd) {
-    srand(time(0));
-
-    CreateWindowW(L"Static", L"Generowanie kart...", WS_VISIBLE | WS_CHILD, 0, 0, 150, 20, hWnd, NULL, NULL, NULL); // statyczny tekst
-
-    char y = '`';
-    int z = 0;
-    for (int x = 0; x <= 52; x++) {
-        Card.push_back(cardStruct());
-        Card[x].cardNr = x;
-        Card[x].cardIndex = z;
-        z++;
-        Card[x].cardSuit = y;
-        if (x % 13 == 0) {
-            y++;
-            z = 0;
-        }
-        cout << Card[x].cardNr << " " << Card[x].cardIndex << " " << Card[x].cardSuit << endl;
-    }
-
-    for (int x = 0; x <= 52; x++) {
-        string number;
-        string suit;
-        string fullName;
-        if (Card[x].cardIndex == 0) {
-            number = "Ace";
-        }
-        if (Card[x].cardIndex == 1) {
-            number = "Two";
-        }
-        if (Card[x].cardIndex == 2) {
-            number = "Three";
-        }
-        if (Card[x].cardIndex == 3) {
-            number = "Four";
-        }
-        if (Card[x].cardIndex == 4) {
-            number = "Five";
-        }
-        if (Card[x].cardIndex == 5) {
-            number = "Six";
-        }
-        if (Card[x].cardIndex == 6) {
-            number = "Seven";
-        }
-        if (Card[x].cardIndex == 7) {
-            number = "Eight";
-        }
-        if (Card[x].cardIndex == 8) {
-            number = "Nine";
-        }
-        if (Card[x].cardIndex == 9) {
-            number = "Ten";
-        }
-        if (Card[x].cardIndex == 10) {
-            number = "Jack";
-        }
-        if (Card[x].cardIndex == 11) {
-            number = "Queen";
-        }
-        if (Card[x].cardIndex == 12) {
-            number = "King";
-        }
-        if (Card[x].cardSuit == 'a') {
-            suit = " of Clubs";
-        }
-        if (Card[x].cardSuit == 'b') {
-            suit = " of Diamonds";
-        }
-        if (Card[x].cardSuit == 'c') {
-            suit = " of Hearts";
-        }
-        if (Card[x].cardSuit == 'd') {
-            suit = " of Spades";
-        }
-        fullName = number.append(suit);
-        CardName.push_back(fullName);
-    }
-    CardName[0].erase();
-
-    for (int x = 0; x <= 52; x++) {
-        string str = CardName[x];
-        wstring temp = wstring(str.begin(), str.end());
-        LPCWSTR text = temp.c_str();
-        CreateWindowW(L"Static", text, WS_VISIBLE | WS_CHILD, 0, 16 + (x * 20), 150, 16, hWnd, NULL, NULL, NULL); // statyczny tekst
-    }
-    cout << "Talia kompletna! \n";
-
-    vector<string> cardStack(CardName.size());
-    vector<int> cardUsed(CardName.size());
-
-    for (int x = 0; x < CardName.size(); x++) {
-        int select;
-        select = rand() % CardName.size();
-        if (cardUsed[select] == 0) {
-            cardUsed[select] = 1;
-            cardStack[x] = CardName[select];
-        }
-        else {
-            x--;
-        }
-    }
-    for (int x = 0; x <= 51; x++) {
-        string str = cardStack[x];
-        wstring temp = wstring(str.begin(), str.end());
-        LPCWSTR text = temp.c_str();
-        CreateWindowW(L"Static", text, WS_VISIBLE | WS_CHILD, 128, 16 + (x * 20), 150, 16, hWnd, NULL, NULL, NULL); // statyczny tekst
-        cout << x << ". " << cardStack[x] << endl;
-    }
-    return cardStack;
-}
 
 int Pair(Player p, int turn, string card) {
     int pairFound = 0;
@@ -441,18 +286,6 @@ void CalculateHand(Player p, int turn) {
     int p4Hand;
 }
 
-// Aplikacja okienkowa
-
-LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-
-void AddMenus(HWND);
-void AddControls(HWND);
-void LoadImages(HWND, vector<string> cards, Player p1, Player p2, Player p3, Player p4);
-void LoadDealingCards(HWND, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4);
-void StartGame(HWND);
-void DealingCards(vector<string> cards);
-int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4, int cardOnTop);
-
 HWND hWindowPlayers0, hWindowPlayers1, hWindowPlayers2, hWindowPlayers3, hWindowPlayers4, hWindowPlayers5, hWindowPlayers6;
 HWND hWindowCoins0, hWindowCoins1, hWindowCoins2, hWindowCoins3, hWindowCoins4;
 HWND hCoins, hOut, hPlayers, hLogo, hCard, hCard1;
@@ -479,30 +312,6 @@ int turn = 0;
 LPCSTR lTurn;
 
 int cardOnTop = 0;
-
-int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow) {
-    WNDCLASSW wc = { 0 }; //definiuje klase okienka
-
-    //przydziela parametry do okienka
-    wc.hbrBackground = (HBRUSH)COLOR_WINDOW; // definiuje tło okna
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW); // definiuje kursor okna
-    wc.hInstance = hInst;
-    wc.lpszClassName = L"myWindowClass"; //definiuje nazwe klasy
-    wc.lpfnWndProc = WindowProcedure; //definiuje proces okna
-
-    if (!RegisterClassW(&wc)) {
-        return -1;
-    }
-
-    CreateWindowW(L"myWindowClass", L"My Window", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 1920, 1080, NULL, NULL, NULL, NULL); //Tworzy okienko
-
-    MSG msg = { 0 };
-    while (GetMessage(&msg, NULL, NULL, NULL)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-    return 0;
-}
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
@@ -868,6 +677,18 @@ void DealingCards(vector<string> cards) {
         }
     }
 }
+int GetWindow(HWND getHwnd) {
+    char x[30];
+    int y;
+    GetWindowTextA(getHwnd, x, 30);
+    y = stoi(x);
+    return y;
+}
+void SetWindow(int value, HWND setHwnd) {
+    string string = to_string(value);
+    LPCSTR lpcstr = string.c_str();
+    SetWindowTextA(setHwnd, lpcstr);
+}
 
 int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4, int cardOnTop) {
     if (p1.active == 1) { 
@@ -891,61 +712,42 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
         //CalculateHand(p1, turn);
         if (moveChoice == 1) {
             //Sprawdź
-            char setBet[30];
-            GetWindowTextA(hP1Bet, setBet, 30);
-            char setCoins[30];
-            GetWindowTextA(hP1Coins, setCoins, 30);
             if (p1.coins >= currentBid) {
                 int selectBid;
                 if (currentBid > 0) {
-                    selectBid = stoi(setBet);
+                    selectBid = GetWindow(hP1Bet);
                 }
                 else
                 {
                     selectBid = 2;
                 }
-                p1.coins = stoi(setCoins);
+                p1.coins = GetWindow(hP1Coins);
                 coinsOnTable += selectBid;
                 currentBid = selectBid;
                 p1.bid = currentBid;
                 p1.coins -= p1.bid;
-                string sCoinsOnTable = to_string(coinsOnTable);
-                LPCSTR lCoinsOnTable = sCoinsOnTable.c_str();
-                SetWindowTextA(hCoinsOnTable, lCoinsOnTable);
-                string sCurrentBid = to_string(currentBid);
-                LPCSTR lCurrentBid = sCurrentBid.c_str();
-                SetWindowTextA(hP1Bet, lCurrentBid);
-                string sCoins = to_string(p1.coins);
-                LPCSTR lCoins = sCoins.c_str();
-                SetWindowTextA(hP1Coins, lCoins);
+                SetWindow(coinsOnTable, hCoinsOnTable);
+                SetWindow(currentBid, hP1Bet);
+                SetWindow(p1.coins, hP1Coins);
                 cout << "GRACZ 1 sprawdza i wpłaca " << selectBid << endl;
                 Ai(p2, hP2Bet, hP2Coins, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
                 Ai(p3, hP3Bet, hP3Coins, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
                 Ai(p4, hP4Bet, hP4Coins, 4, p4.ai, turn, ai4Move, p4.pass, currentBid, p4.coins, p4.bid);
+                PassCards(p1.pass, p2.pass, p3.pass, p4.pass);
             }
         }
         if (moveChoice == 2) {
             //Postaw
-            char setBet[30];
-            GetWindowTextA(hSetBet, setBet , 30);
-            char setCoins[30];
-            GetWindowTextA(hP1Coins, setCoins, 30);
             if (p1.coins >= currentBid) {
-                p1.coins = stoi(setCoins);
-                int selectBid = stoi(setBet);
+                p1.coins = GetWindow(hP1Coins);
+                int selectBid = GetWindow(hSetBet);
                 coinsOnTable += selectBid;
                 currentBid += selectBid;
                 p1.bid = currentBid;
                 p1.coins -= p1.bid;
-                string sCoinsOnTable = to_string(coinsOnTable);
-                LPCSTR lCoinsOnTable = sCoinsOnTable.c_str();
-                SetWindowTextA(hCoinsOnTable, lCoinsOnTable);
-                string sCurrentBid = to_string(currentBid);
-                LPCSTR lCurrentBid = sCurrentBid.c_str();
-                SetWindowTextA(hP1Bet, lCurrentBid);
-                string sCoins = to_string(p1.coins);
-                LPCSTR lCoins = sCoins.c_str();
-                SetWindowTextA(hP1Coins, lCoins);
+                SetWindow(coinsOnTable, hCoinsOnTable);
+                SetWindow(currentBid, hP1Bet);
+                SetWindow(p1.coins, hP1Coins);
                 cout << "GRACZ 1 stawia " << selectBid << " zetonow! " << endl;
                 Ai(p2, hP2Bet, hP2Coins, 2, p2.ai, turn, ai2Move, p2.pass, currentBid, p2.coins, p2.bid);
                 Ai(p3, hP3Bet, hP3Coins, 3, p3.ai, turn, ai3Move, p3.pass, currentBid, p3.coins, p3.bid);
@@ -969,9 +771,6 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
                     passStatus = "Aktywny ";
                 }
                 else { passStatus = "Spasowal "; }
-                cout << "GRACZ 1: " << passStatus << endl;
-                cout << "Zetony: " << p1.coins << endl;
-                cout << p1.hand[0] << ", " << p1.hand[1] << endl;
             }
             if (p2.active == 1)
             {
@@ -980,9 +779,6 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
                     passStatus = "Aktywny ";
                 }
                 else { passStatus = "Spasowal "; }
-                cout << "GRACZ 2: " << passStatus << endl;
-                cout << "Zetony: " << p2.coins << endl;
-                cout << p2.hand[0] << ", " << p2.hand[1] << endl;
             }
             if (p3.active == 1)
             {
@@ -991,9 +787,6 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
                     passStatus = "Aktywny ";
                 }
                 else { passStatus = "Spasowal "; }
-                cout << "GRACZ 3: " << passStatus << endl;
-                cout << "Zetony: " << p3.coins << endl;
-                cout << p3.hand[0] << ", " << p3.hand[1] << endl;
             }
             if (p4.active == 1)
             {
@@ -1002,15 +795,7 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
                     passStatus = "Aktywny ";
                 }
                 else { passStatus = "Spasowal "; }
-                cout << "GRACZ 4: " << passStatus << endl;
-                cout << "Zetony: " << p4.coins << endl;
-                cout << p4.hand[0] << ", " << p4.hand[1] << endl;
             }
-            cout << "Zetony na stole: " << coinsOnTable << endl;
-            cout << "Obecny zaklad: " << currentBid << endl;
-            if (cardOnTop > 2 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << endl; }
-            if (cardOnTop > 4 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << cardOnTable[3] << endl; }
-            if (cardOnTop > 6 + ((int)players * 2)) { cout << "Karty na stole: " << cardOnTable[0] << ", " << cardOnTable[1] << ", " << cardOnTable[2] << ", " << cardOnTable[3] << ", " << cardOnTable[4] << endl; }
         }
 
         if (((p1.pass == 0 && p1.bid == currentBid) || (p1.pass == 1 && p1.bid != currentBid)) && ((p2.pass == 0 && p2.bid == currentBid) || (p2.pass == 1 && p2.bid != currentBid)) && ((p3.pass == 0 && p3.bid == currentBid) || (p3.pass == 1 && p3.bid != currentBid)) && ((p4.pass == 0 && p4.bid == currentBid) || (p4.pass == 1 && p4.bid != currentBid))) {
@@ -1052,38 +837,70 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
         //Ustalenie zwyciescy
         if (p1.pass == 0 && p2.pass == 1 && p3.pass == 1 && p4.pass == 1) {
             p1.coins += coinsOnTable;
+            SetWindow(p1.coins, hP1Coins);
             coinsOnTable = 0;
+            SetWindow(coinsOnTable, hCoinsOnTable);
+            EraseHand();
+            turn = -1;
+            SetWindow(turn, hTurn);
             cout << "Wygrywa Gracz 1! " << endl;
             p2.pass = 0;
             p3.pass = 0;
             p4.pass = 0;
+            stack = CardGeneration(hWnd);
+            LoadImages(hWnd, stack, p1, p2, p3, p4);
+            DealingCards(stack);
             break;
         }
         else if (p1.pass == 1 && p2.pass == 0 && p3.pass == 1 && p4.pass == 1) {
             p2.coins += coinsOnTable;
+            SetWindow(p2.coins, hP1Coins);
             coinsOnTable = 0;
+            SetWindow(coinsOnTable, hCoinsOnTable);
+            EraseHand();
+            turn = -1;
+            SetWindow(turn, hTurn);
             cout << "Wygrywa Gracz 2! " << endl;
             p1.pass = 0;
             p3.pass = 0;
             p4.pass = 0;
+            stack = CardGeneration(hWnd);
+            LoadImages(hWnd, stack, p1, p2, p3, p4);
+            DealingCards(stack);
             break;
         }
         else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 0 && p4.pass == 1) {
             p3.coins += coinsOnTable;
+            SetWindow(p3.coins, hP1Coins);
             coinsOnTable = 0;
+            SetWindow(coinsOnTable, hCoinsOnTable);
+            EraseHand();
+            turn = -1;
+            SetWindow(turn, hTurn);
             cout << "Wygrywa Gracz 3! " << endl;
             p1.pass = 0;
             p2.pass = 0;
             p4.pass = 0;
+            stack = CardGeneration(hWnd);
+            LoadImages(hWnd, stack, p1, p2, p3, p4);
+            DealingCards(stack);
             break;
         }
         else if (p1.pass == 1 && p2.pass == 1 && p3.pass == 1 && p4.pass == 0) {
             p4.coins += coinsOnTable;
+            SetWindow(p4.coins, hP1Coins);
             coinsOnTable = 0;
+            SetWindow(coinsOnTable, hCoinsOnTable);
+            EraseHand();
+            turn = -1;
+            SetWindow(turn, hTurn);
             cout << "Wygrywa Gracz 4! " << endl;
             p1.pass = 0;
             p2.pass = 0;
             p3.pass = 0;
+            stack = CardGeneration(hWnd);
+            LoadImages(hWnd, stack, p1, p2, p3, p4);
+            DealingCards(stack);
             break;
         }
 

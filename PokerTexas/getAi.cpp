@@ -1,5 +1,18 @@
 #include "poker.h"
 
+int AiCharacter() {
+    //0 - Spokojny
+    //1 - Agresyny
+    //2 - Pasywny
+    //3 - Chaotyczny
+    //4 - 
+    //5 -
+    int ai;
+    //ai = rand() % 2;
+    ai = 0;
+    return ai;
+}
+
 int Player::AiMove(int nr, int ai, int currentBid, int playerBid) {
     int move;
     if (ai == 0) {

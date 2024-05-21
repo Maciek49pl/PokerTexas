@@ -27,7 +27,11 @@
 #define PASS 202
 #define WAIT 203
 
+LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+
 using namespace std;
+
+vector<string> CardGeneration(HWND hWnd);
 
 class Player {
 public:
@@ -44,3 +48,17 @@ public:
     int AiBet(int nr, int& coinsOnTable, int& currentBid, int& coins);
     int AiCheck(int nr, int& coinsOnTable, int& currentBid, int& coins, int& playerBid);
 };
+
+int AiCharacter();
+void AddMenus(HWND);
+void AddControls(HWND);
+void LoadImages(HWND, vector<string> cards, Player p1, Player p2, Player p3, Player p4);
+void LoadDealingCards(HWND, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4);
+void PassCards(int p1, int p2, int p3, int p4);
+void StartGame(HWND);
+void DealingCards(vector<string> cards);
+int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4, int cardOnTop);
+
+int GetWindow(HWND getHwnd);
+void SetWindow(int value, HWND setHwnd);
+void EraseHand();
