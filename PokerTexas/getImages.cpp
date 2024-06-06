@@ -21,6 +21,33 @@ HBITMAP hbKingOfClubs, hbKingOfDiamonds, hbKingOfHearts, hbKingOfSpades;
 
 HBITMAP hLogoImage, hCardReverse, hCardImage, hGenerateImage;
 
+void SetHands(HWND hWnd)
+{
+    int p1Hand0_x = 400 + 300, p1Hand0_y = 850;
+    hP1Hand0 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p1Hand0_x, p1Hand0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+    int p1Hand1_x = 500 + 300, p1Hand1_y = 850;
+    hP1Hand1 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p1Hand1_x, p1Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+    int p2Hand0_x = 200 + 100, p2Hand0_y = 450;
+    hP2Hand0 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p2Hand0_x, p2Hand0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+    int p2Hand1_x = 300 + 100, p2Hand1_y = 450;
+    hP2Hand1 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p2Hand1_x, p2Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+    int p3Hand0_x = 400 + 300, p3Hand0_y = 100;
+    hP3Hand0 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p3Hand0_x, p3Hand0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+    int p3Hand1_x = 500 + 300, p3Hand1_y = 100;
+    hP3Hand1 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p3Hand1_x, p3Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+    int p4Hand0_x = 600 + 800, p4Hand0_y = 450;
+    hP4Hand0 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p4Hand0_x, p4Hand0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+
+    int p4Hand1_x = 700 + 800, p4Hand1_y = 450;
+    hP4Hand1 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p4Hand1_x, p4Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+}
+
 void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3, Player p4) {
     hLogoImage = (HBITMAP)LoadImageW(NULL, L"PokerCards\\test.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hCardReverse = (HBITMAP)LoadImageW(NULL, L"PokerCards\\CardReverse.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
@@ -104,9 +131,7 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
         cardOnTop = 8;
     }
 
-    int p1Hand0_x = 400 + 300, p1Hand0_y = 850;
-
-    hP1Hand0 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p1Hand0_x, p1Hand0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
+    SetHands(hWnd);
 
     if (p1.hand[0] == "Ace of Clubs")
     {
@@ -367,10 +392,6 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
         SendMessageW(hP1Hand0, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
     }
 
-    int p1Hand1_x = 500 + 300, p1Hand1_y = 850;
-
-    hP1Hand1 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p1Hand1_x, p1Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
-
     if (p1.hand[1] == "Ace of Clubs")
     {
         SendMessageW(hP1Hand1, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
@@ -629,10 +650,6 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
     {
         SendMessageW(hP1Hand1, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
     }
-
-    int p2Hand0_x = 200 + 100, p2Hand0_y = 450;
-
-    hP2Hand0 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p2Hand0_x, p2Hand0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
 
     if (p2.hand[0] == "Ace of Clubs")
     {
@@ -893,10 +910,6 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
         SendMessageW(hP2Hand0, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
     }
 
-    int p2Hand1_x = 300 + 100, p2Hand1_y = 450;
-
-    hP2Hand1 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p2Hand1_x, p2Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
-
     if (p2.hand[1] == "Ace of Clubs")
     {
         SendMessageW(hP2Hand1, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
@@ -1155,10 +1168,6 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
     {
         SendMessageW(hP2Hand1, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
     }
-
-    int p3Hand0_x = 400 + 300, p3Hand0_y = 100;
-
-    hP3Hand0 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p3Hand0_x, p3Hand0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
 
     if (p3.hand[0] == "Ace of Clubs")
     {
@@ -1419,10 +1428,6 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
         SendMessageW(hP3Hand0, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
     }
 
-    int p3Hand1_x = 500 + 300, p3Hand1_y = 100;
-
-    hP3Hand1 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p3Hand1_x, p3Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
-
     if (p3.hand[1] == "Ace of Clubs")
     {
         SendMessageW(hP3Hand1, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
@@ -1682,10 +1687,6 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
         SendMessageW(hP3Hand1, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
     }
 
-    int p4Hand0_x = 600 + 800, p4Hand0_y = 450;
-
-    hP4Hand0 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p4Hand0_x, p4Hand0_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
-
     if (p4.hand[0] == "Ace of Clubs")
     {
         SendMessageW(hP4Hand0, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbAceOfClubs);
@@ -1944,10 +1945,6 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
     {
         SendMessageW(hP4Hand0, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hbKingOfSpades);
     }
-
-    int p4Hand1_x = 700 + 800, p4Hand1_y = 450;
-
-    hP4Hand1 = CreateWindow(L"Static", NULL, WS_VISIBLE | WS_CHILD | SS_BITMAP, p4Hand1_x, p4Hand1_y, 80, 30, hWnd, NULL, NULL, NULL); // statyczny tekst
 
     if (p4.hand[1] == "Ace of Clubs")
     {
@@ -2209,7 +2206,7 @@ void LoadImages(HWND hWnd, vector<string> cards, Player p1, Player p2, Player p3
     }
 }
 
-void EraseHand()
+void EraseHand(Player p1, Player p2, Player p3, Player p4)
 {
     DestroyWindow(hP1Hand0);
     DestroyWindow(hP1Hand1);
@@ -2219,6 +2216,15 @@ void EraseHand()
     DestroyWindow(hP3Hand1);
     DestroyWindow(hP4Hand0);
     DestroyWindow(hP4Hand1);
+
+    p1.hand[0].erase();
+    p1.hand[1].erase();
+    p2.hand[0].erase();
+    p2.hand[1].erase();
+    p3.hand[0].erase();
+    p3.hand[1].erase();
+    p4.hand[0].erase();
+    p4.hand[1].erase();
 }
 
 void LoadDealingCards(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Player p3, Player p4)

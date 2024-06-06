@@ -27,6 +27,8 @@
 #define PASS 202
 #define WAIT 203
 
+#define NEW_HAND 204
+
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 
 using namespace std;
@@ -61,4 +63,5 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
 
 int GetWindow(HWND getHwnd);
 void SetWindow(int value, HWND setHwnd);
-void EraseHand();
+void SetHands(HWND hWnd);
+void EraseHand(Player p1, Player p2, Player p3, Player p4);
