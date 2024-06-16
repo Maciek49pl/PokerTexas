@@ -7,9 +7,6 @@
 #include <ctime>
 #include <windows.h>
 
-#define IDC_COINS 100
-#define IDC_OUT 101
-
 #define FILE_MENU_NEW 1
 #define FILE_MENU_OPEN 2
 #define FILE_MENU_EXIT 3
@@ -22,12 +19,26 @@
 #define SELECT_COINS 9
 #define START_GAME 10
 
+#define IDC_COINS 100
+#define IDC_OUT 101
+
 #define CHECK 200
 #define BET 201
 #define PASS 202
 #define WAIT 203
 
 #define NEW_HAND 204
+
+#define ODDS_HIGH_CARD 300
+#define ODDS_PAIR 301
+#define ODDS_TWO_OF_PAIRS 302
+#define ODDS_THREE 303
+#define ODDS_STRAIGHT 304
+#define ODDS_FLUSH 305
+#define ODDS_FULL_HOUSE 306
+#define ODDS_FOUR_OF_KIND 307
+#define ODDS_STRAIGHT_FLUSH 308
+#define ODDS_ROYAL_FLUSH 309
 
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 
@@ -42,6 +53,7 @@ public:
     int pass = 0;
     int coins = 0;
     int bid = 0;
+    int odds = ODDS_HIGH_CARD;
     vector<string> hand;
 
     int AiMove(int nr, int ai, int currentBid, int playerBid);

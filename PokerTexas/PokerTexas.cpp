@@ -28,7 +28,7 @@ std::wstring stringToWString(const std::string& s) {
     return std::wstring(&buf[0]);
 }
 
-int Pair(Player p, vector<string> cards, int turn, string card) {
+int Pair(Player p, vector<string> cards, int turn, string card, int &odds) {
     int pairFound = 0;
     for (int x = 0; x < 2; x++) {
         if (p.hand[x].find(card) != string::npos) {
@@ -56,12 +56,14 @@ int Pair(Player p, vector<string> cards, int turn, string card) {
     if (pairFound == 3) {
         cout << "Znaleziono pare! " << card << endl;
         pairFound = 0;
+        odds = ODDS_PAIR;
         return 1;
     }
     else if (pairFound == 4) {
         cout << "Znaleziono trojke! " << card << endl;
         pairFound = 0;
-        return 2;
+        odds = ODDS_THREE;
+        return 3;
     }
     else {
         pairFound = 0;
@@ -69,47 +71,47 @@ int Pair(Player p, vector<string> cards, int turn, string card) {
     }
 }
 
-int CalculateHand(Player p, int turn) {
+int CalculateHand(Player p, int turn, int& odds) {
     int result;
     for (int x = 0; x < 2; x++) {
         if (p.hand[x].find("Ace") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Ace");
+            result = Pair(p, cardOnTable, turn, "Ace", odds);
         }
         if (p.hand[x].find("Two") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Two");
+            result = Pair(p, cardOnTable, turn, "Two", odds);
         }
         if (p.hand[x].find("Three") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Three");
+            result = Pair(p, cardOnTable, turn, "Three", odds);
         }
         if (p.hand[x].find("Four") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Four");
+            result = Pair(p, cardOnTable, turn, "Four", odds);
         }
         if (p.hand[x].find("Five") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Five");
+            result = Pair(p, cardOnTable, turn, "Five", odds);
         }
         if (p.hand[x].find("Six") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Six");
+            result = Pair(p, cardOnTable, turn, "Six", odds);
         }
         if (p.hand[x].find("Seven") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Seven");
+            result = Pair(p, cardOnTable, turn, "Seven", odds);
         }
         if (p.hand[x].find("Eight") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Eight");
+            result = Pair(p, cardOnTable, turn, "Eight", odds);
         }
         if (p.hand[x].find("Nine") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Nine");
+            result = Pair(p, cardOnTable, turn, "Nine", odds);
         }
         if (p.hand[x].find("Ten") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Ten");
+            result = Pair(p, cardOnTable, turn, "Ten", odds);
         }
         if (p.hand[x].find("Jack") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Jack");
+            result = Pair(p, cardOnTable, turn, "Jack", odds);
         }
         if (p.hand[x].find("Queen") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "Queen");
+            result = Pair(p, cardOnTable, turn, "Queen", odds);
         }
         if (p.hand[x].find("King") != string::npos) {
-            result = Pair(p, cardOnTable, turn, "King");
+            result = Pair(p, cardOnTable, turn, "King", odds);
         }
         if (p.hand[x].find("Clubs") != string::npos) {
             //result = Pair(p, cardOnTable, turn, "Clubs");
@@ -126,43 +128,43 @@ int CalculateHand(Player p, int turn) {
         if (turn > 1) {
             for (int x = 0; x < 3; x++) {
                 if (cardOnTable[x].find("Ace") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Ace");
+                    result = Pair(p, cardOnTable, turn, "Ace", odds);
                 }
                 if (cardOnTable[x].find("Two") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Two");
+                    result = Pair(p, cardOnTable, turn, "Two", odds);
                 }
                 if (cardOnTable[x].find("Three") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Three");
+                    result = Pair(p, cardOnTable, turn, "Three", odds);
                 }
                 if (cardOnTable[x].find("Four") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Four");
+                    result = Pair(p, cardOnTable, turn, "Four", odds);
                 }
                 if (cardOnTable[x].find("Five") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Five");
+                    result = Pair(p, cardOnTable, turn, "Five", odds);
                 }
                 if (cardOnTable[x].find("Six") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Six");
+                    result = Pair(p, cardOnTable, turn, "Six", odds);
                 }
                 if (cardOnTable[x].find("Seven") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Seven");
+                    result = Pair(p, cardOnTable, turn, "Seven", odds);
                 }
                 if (cardOnTable[x].find("Eight") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Eight");
+                    result = Pair(p, cardOnTable, turn, "Eight", odds);
                 }
                 if (cardOnTable[x].find("Nine") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Nine");
+                    result = Pair(p, cardOnTable, turn, "Nine", odds);
                 }
                 if (cardOnTable[x].find("Ten") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Ten");
+                    result = Pair(p, cardOnTable, turn, "Ten", odds);
                 }
                 if (cardOnTable[x].find("Jack") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Jack");
+                    result = Pair(p, cardOnTable, turn, "Jack", odds);
                 }
                 if (cardOnTable[x].find("Queen") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "Queen");
+                    result = Pair(p, cardOnTable, turn, "Queen", odds);
                 }
                 if (cardOnTable[x].find("King") != string::npos) {
-                    result = Pair(p, cardOnTable, turn, "King");
+                    result = Pair(p, cardOnTable, turn, "King", odds);
                 }
                 if (cardOnTable[x].find("Clubs") != string::npos) {
                     //result = Pair(p, cardOnTable, turn, "Clubs");
@@ -180,43 +182,43 @@ int CalculateHand(Player p, int turn) {
         }
         if (turn > 2) {
             if (cardOnTable[3].find("Ace") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Ace");
+                result = Pair(p, cardOnTable, turn, "Ace", odds);
             }
             if (cardOnTable[3].find("Two") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Two");
+                result = Pair(p, cardOnTable, turn, "Two", odds);
             }
             if (cardOnTable[3].find("Three") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Three");
+                result = Pair(p, cardOnTable, turn, "Three", odds);
             }
             if (cardOnTable[3].find("Four") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Four");
+                result = Pair(p, cardOnTable, turn, "Four", odds);
             }
             if (cardOnTable[3].find("Five") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Five");
+                result = Pair(p, cardOnTable, turn, "Five", odds);
             }
             if (cardOnTable[3].find("Six") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Six");
+                result = Pair(p, cardOnTable, turn, "Six", odds);
             }
             if (cardOnTable[3].find("Seven") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Seven");
+                result = Pair(p, cardOnTable, turn, "Seven", odds);
             }
             if (cardOnTable[3].find("Eight") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Eight");
+                result = Pair(p, cardOnTable, turn, "Eight", odds);
             }
             if (cardOnTable[3].find("Nine") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Nine");
+                result = Pair(p, cardOnTable, turn, "Nine", odds);
             }
             if (cardOnTable[3].find("Ten") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Ten");
+                result = Pair(p, cardOnTable, turn, "Ten", odds);
             }
             if (cardOnTable[3].find("Jack") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Jack");
+                result = Pair(p, cardOnTable, turn, "Jack", odds);
             }
             if (cardOnTable[3].find("Queen") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Queen");
+                result = Pair(p, cardOnTable, turn, "Queen", odds);
             }
             if (cardOnTable[3].find("King") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "King");
+                result = Pair(p, cardOnTable, turn, "King", odds);
             }
             if (cardOnTable[3].find("Clubs") != string::npos) {
                 //result = Pair(p, cardOnTable, turn, "Clubs");
@@ -233,43 +235,43 @@ int CalculateHand(Player p, int turn) {
         }
         if (turn > 3) {
             if (cardOnTable[4].find("Ace") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Ace");
+                result = Pair(p, cardOnTable, turn, "Ace", odds);
             }
             if (cardOnTable[4].find("Two") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Two");
+                result = Pair(p, cardOnTable, turn, "Two", odds);
             }
             if (cardOnTable[4].find("Three") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Three");
+                result = Pair(p, cardOnTable, turn, "Three", odds);
             }
             if (cardOnTable[4].find("Four") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Four");
+                result = Pair(p, cardOnTable, turn, "Four", odds);
             }
             if (cardOnTable[4].find("Five") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Five");
+                result = Pair(p, cardOnTable, turn, "Five", odds);
             }
             if (cardOnTable[4].find("Six") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Six");
+                result = Pair(p, cardOnTable, turn, "Six", odds);
             }
             if (cardOnTable[4].find("Seven") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Seven");
+                result = Pair(p, cardOnTable, turn, "Seven", odds);
             }
             if (cardOnTable[4].find("Eight") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Eight");
+                result = Pair(p, cardOnTable, turn, "Eight", odds);
             }
             if (cardOnTable[4].find("Nine") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Nine");
+                result = Pair(p, cardOnTable, turn, "Nine", odds);
             }
             if (cardOnTable[4].find("Ten") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Ten");
+                result = Pair(p, cardOnTable, turn, "Ten", odds);
             }
             if (cardOnTable[4].find("Jack") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Jack");
+                result = Pair(p, cardOnTable, turn, "Jack", odds);
             }
             if (cardOnTable[4].find("Queen") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "Queen");
+                result = Pair(p, cardOnTable, turn, "Queen", odds);
             }
             if (cardOnTable[4].find("King") != string::npos) {
-                result = Pair(p, cardOnTable, turn, "King");
+                result = Pair(p, cardOnTable, turn, "King", odds);
             }
             if (cardOnTable[4].find("Clubs") != string::npos) {
                 //result = Pair(p, cardOnTable, turn, "Clubs");
@@ -711,6 +713,7 @@ void DealingCards(vector<string> cards) {
         }
     }
 }
+
 int GetWindow(HWND getHwnd) {
     char x[30];
     int y;
@@ -718,21 +721,26 @@ int GetWindow(HWND getHwnd) {
     y = stoi(x);
     return y;
 }
+
 void SetWindow(int value, HWND setHwnd) {
     string string = to_string(value);
     LPCSTR lpcstr = string.c_str();
     SetWindowTextA(setHwnd, lpcstr);
 }
 
-void CardResult()
+void CardResult(Player p, int turn, int& odds)
 {
     int cardOdd;
     string cardResult;
 
-    cardOdd = CalculateHand(p1, turn);
-    if (cardOdd == 0) { cardResult = "Wysoka karta"; }
-    if (cardOdd == 1) { cardResult = "Para"; }
-    if (cardOdd == 3) { cardResult = "Trójka"; }
+    cardOdd = CalculateHand(p, turn, odds);
+    if (odds = ODDS_HIGH_CARD) { cardOdd == 0; }
+    if (odds = ODDS_PAIR) { cardOdd == 1; }
+    if (odds = ODDS_THREE) { cardOdd == 3; }
+
+    if (cardOdd == 0) { cardResult = "Wysoka karta"; odds = ODDS_HIGH_CARD; }
+    if (cardOdd == 1) { cardResult = "Para"; odds = ODDS_PAIR; }
+    if (cardOdd == 3) { cardResult = "Trójka"; odds = ODDS_THREE; }
     LPCSTR lCardResult = cardResult.c_str();
     SetWindowTextA(hCardOdd, lCardResult);
 }
@@ -848,7 +856,7 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
             cout << "Rozdawanie kart... " << endl;
             if (turn == 0) { 
                 lTurn = "0";
-                CardResult();
+                CardResult(p1, turn, p1.odds);
             }
             if (turn == 1)
             {
@@ -860,7 +868,7 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
                     cardOnTable.push_back(cards[cardOnTop]);
                 }
                 lTurn = "1";
-                CardResult();
+                CardResult(p1, turn, p1.odds);
             }
             if (turn == 2)
             {
@@ -871,7 +879,7 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
                 cardOnTop++;
                 cardOnTable.push_back(cards[cardOnTop]);
                 lTurn = "2";
-                CardResult();
+                CardResult(p1, turn, p1.odds);
             }
             if (turn == 3)
             {
@@ -882,7 +890,7 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
                 cardOnTop++;
                 cardOnTable.push_back(cards[cardOnTop]);
                 lTurn = "3";
-                CardResult();
+                CardResult(p1, turn, p1.odds);
             }
         }
 
@@ -901,6 +909,7 @@ int PlayGame(HWND hWnd, int turn, vector<string> cards, Player p1, Player p2, Pl
             hNewHand = CreateWindowW(L"Button", L"1", WS_VISIBLE | WS_CHILD | WS_BORDER, 650, 340, 50, 30, hWnd, (HMENU)NEW_HAND, NULL, NULL); // Przycisk
             stack.clear();
             stack = CardGeneration(hWnd);
+            p1.odds = ODDS_HIGH_CARD;
             break;
         }
         else if (p1.pass == 1 && p2.pass == 0 && p3.pass == 1 && p4.pass == 1) {
